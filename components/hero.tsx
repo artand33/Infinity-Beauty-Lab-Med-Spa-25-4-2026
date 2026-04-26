@@ -15,7 +15,8 @@ const mobileNavItems = [
   { label: "Membership", targetId: "membership" },
   { label: "Find your treatment", targetId: "find-your-treatment" },
   { label: "Inside the studio", targetId: "studio" },
-  { label: "Reviews", targetId: "reviews-wall" },
+  { label: "Case studies", targetId: "case-studies" },
+  { label: "In their own words", targetId: "in-their-own-words" },
   { label: "FAQ", targetId: "faq" },
   { label: "Book your visit", targetId: "book" },
 ]

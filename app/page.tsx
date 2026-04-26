@@ -77,7 +77,6 @@ const beforeAfterFilterCategories: Array<{
   { id: "skin", label: "Skin" },
 ]
 
-type TransformationCategory = "texture" | "pigmentation" | "laxity" | "tone"
 type QuizConcern = "texture" | "pigmentation" | "laxity" | "acne-scars"
 type QuizAge = "under-30" | "30-40" | "40-50" | "50-plus"
 type QuizDowntime = "none" | "day-or-two" | "up-to-week"
@@ -85,61 +84,36 @@ type QuizInvestment = "single" | "package" | "membership"
 
 const featuredInPublications = ["Vogue", "Elle", "Allure", "Harper's Bazaar", "Forbes Health"]
 
-const transformationFilterCategories: Array<{ id: TransformationCategory; label: string }> = [
-  { id: "texture", label: "Texture" },
-  { id: "pigmentation", label: "Pigmentation" },
-  { id: "laxity", label: "Laxity" },
-  { id: "tone", label: "Tone" },
-]
-
-const transformationSlots: Array<{ beforeImage: string; afterImage: string }> = [
+const caseStudies = [
   {
-    beforeImage: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=800&q=80",
-    afterImage: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&q=80",
+    image:
+      "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=1200&q=88",
+    tag: "Texture · Morpheus8",
+    headline: "From dull to luminous in six weeks.",
+    quote: "I came in skeptical and left a believer.",
+    attribution: "Sofía M., 38",
+    detail: "Three sessions · 8 weeks · Maintenance ongoing",
   },
   {
-    beforeImage: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=800&q=80",
-    afterImage: "https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=800&q=80",
+    image:
+      "https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=1200&q=88",
+    tag: "Pigmentation · Lumecca IPL",
+    headline: "Sun-worn skin, reintroduced to clarity.",
+    quote:
+      "Three months in and my pigmentation issues from years of Miami sun are visibly lighter. Worth every dollar.",
+    attribution: "Daniela T., 44",
+    detail: "Two sessions · 10 weeks · Touch-ups as needed",
   },
   {
-    beforeImage: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&q=80",
-    afterImage: "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=800&q=80",
+    image:
+      "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=1200&q=88",
+    tag: "Laxity · RF Skin Tightening",
+    headline: "Contour that still looks like you.",
+    quote: "I came in skeptical about RF and left a believer. The jawline tightening is subtle but it is there.",
+    attribution: "Valentina P., 41",
+    detail: "Four sessions · 12 weeks · Membership maintenance",
   },
-]
-
-const transformationPairs: Array<{
-  id: string
-  category: TransformationCategory
-  concern: string
-  treatment: string
-  beforeImage: string
-  afterImage: string
-}> = [
-  { id: "texture-1", category: "texture", concern: "Texture", treatment: "Morpheus8", ...transformationSlots[0] },
-  { id: "texture-2", category: "texture", concern: "Texture", treatment: "Medical Microneedling", ...transformationSlots[1] },
-  { id: "texture-3", category: "texture", concern: "Texture", treatment: "Morpheus8", ...transformationSlots[2] },
-  { id: "texture-4", category: "texture", concern: "Texture", treatment: "Medical Microneedling", ...transformationSlots[0] },
-  { id: "texture-5", category: "texture", concern: "Texture", treatment: "Morpheus8", ...transformationSlots[1] },
-  { id: "texture-6", category: "texture", concern: "Texture", treatment: "Medical Microneedling", ...transformationSlots[2] },
-  { id: "pigmentation-1", category: "pigmentation", concern: "Pigmentation", treatment: "Lumecca IPL", ...transformationSlots[0] },
-  { id: "pigmentation-2", category: "pigmentation", concern: "Pigmentation", treatment: "Lumecca IPL", ...transformationSlots[1] },
-  { id: "pigmentation-3", category: "pigmentation", concern: "Pigmentation", treatment: "Lumecca IPL", ...transformationSlots[2] },
-  { id: "pigmentation-4", category: "pigmentation", concern: "Pigmentation", treatment: "Lumecca IPL", ...transformationSlots[0] },
-  { id: "pigmentation-5", category: "pigmentation", concern: "Pigmentation", treatment: "Lumecca IPL", ...transformationSlots[1] },
-  { id: "pigmentation-6", category: "pigmentation", concern: "Pigmentation", treatment: "Lumecca IPL", ...transformationSlots[2] },
-  { id: "laxity-1", category: "laxity", concern: "Laxity", treatment: "RF Skin Tightening", ...transformationSlots[0] },
-  { id: "laxity-2", category: "laxity", concern: "Laxity", treatment: "Morpheus8", ...transformationSlots[1] },
-  { id: "laxity-3", category: "laxity", concern: "Laxity", treatment: "RF Skin Tightening", ...transformationSlots[2] },
-  { id: "laxity-4", category: "laxity", concern: "Laxity", treatment: "Morpheus8", ...transformationSlots[0] },
-  { id: "laxity-5", category: "laxity", concern: "Laxity", treatment: "RF Skin Tightening", ...transformationSlots[1] },
-  { id: "laxity-6", category: "laxity", concern: "Laxity", treatment: "Morpheus8", ...transformationSlots[2] },
-  { id: "tone-1", category: "tone", concern: "Tone", treatment: "Lumecca IPL", ...transformationSlots[0] },
-  { id: "tone-2", category: "tone", concern: "Tone", treatment: "Morpheus8", ...transformationSlots[1] },
-  { id: "tone-3", category: "tone", concern: "Tone", treatment: "Medical Microneedling", ...transformationSlots[2] },
-  { id: "tone-4", category: "tone", concern: "Tone", treatment: "Lumecca IPL", ...transformationSlots[0] },
-  { id: "tone-5", category: "tone", concern: "Tone", treatment: "Morpheus8", ...transformationSlots[1] },
-  { id: "tone-6", category: "tone", concern: "Tone", treatment: "Medical Microneedling", ...transformationSlots[2] },
-]
+] as const
 
 const reviews = [
   {
@@ -454,10 +428,6 @@ export default function Page() {
   const [activeBeforeAfterCategory, setActiveBeforeAfterCategory] =
     useState<BeforeAfterCategory>("face")
   const [beforeAfterGridVisible, setBeforeAfterGridVisible] = useState(true)
-  const [activeTransformationCategory, setActiveTransformationCategory] =
-    useState<TransformationCategory>("texture")
-  const [transformationsGridVisible, setTransformationsGridVisible] = useState(true)
-  const [reviewsExpanded, setReviewsExpanded] = useState(false)
   const [quizStep, setQuizStep] = useState(0)
   const [quizPanelVisible, setQuizPanelVisible] = useState(true)
   const [quizTransitionDirection, setQuizTransitionDirection] = useState<1 | -1>(1)
@@ -474,7 +444,7 @@ export default function Page() {
     investment: null,
   })
   const [cardSplitById, setCardSplitById] = useState<Record<string, number>>(() =>
-    Object.fromEntries([...beforeAfterPairs, ...transformationPairs].map((p) => [p.id, 50])),
+    Object.fromEntries(beforeAfterPairs.map((p) => [p.id, 50])),
   )
   const [bookingModalOpen, setBookingModalOpen] = useState(false)
   const [bookingSubmitted, setBookingSubmitted] = useState(false)
@@ -494,11 +464,7 @@ export default function Page() {
   const visibleBeforeAfterPairs = beforeAfterPairs.filter(
     (p) => p.category === activeBeforeAfterCategory,
   )
-  const visibleTransformationPairs = transformationPairs.filter(
-    (pair) => pair.category === activeTransformationCategory,
-  )
-  const primaryReviews = reviews.slice(0, 3)
-  const secondaryReviews = reviews.slice(3)
+  const supportingReviews = reviews.slice(0, 3)
 
   useEffect(() => {
     if (!bookingModalOpen) return
@@ -526,17 +492,6 @@ export default function Page() {
       setActiveBeforeAfterCategory(next)
       requestAnimationFrame(() => {
         requestAnimationFrame(() => setBeforeAfterGridVisible(true))
-      })
-    }, 220)
-  }
-
-  const selectTransformationCategory = (next: TransformationCategory) => {
-    if (next === activeTransformationCategory) return
-    setTransformationsGridVisible(false)
-    window.setTimeout(() => {
-      setActiveTransformationCategory(next)
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => setTransformationsGridVisible(true))
       })
     }, 220)
   }
@@ -696,7 +651,7 @@ export default function Page() {
     <main className="relative z-[2] bg-transparent text-[#3A2820]">
       <Hero onOpenBookingModal={openBookingModal} />
 
-      <section className="border-y border-[#B8704C]/15 bg-[#EFE3D5]/80 px-6 py-8 md:px-14 lg:px-20">
+      <section className="border-y border-[#B8704C]/15 bg-[#EFE3D5] px-6 py-8 md:px-14 lg:px-20">
         <ScrollReveal as="div" className="mx-auto w-full max-w-6xl">
           <ScrollRevealItem order={0}>
             <div className="flex w-full flex-wrap items-center justify-center gap-4 md:gap-6">
@@ -1002,97 +957,126 @@ export default function Page() {
       </section>
 
       <section className="bg-[#EFE3D5]/65 px-6 py-20 md:px-14 lg:px-20" id="investment">
-        <div className="mx-auto w-full max-w-6xl">
-          <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
-            Investment
-          </p>
-          <h2 className="font-serif text-4xl leading-[1.06] text-[#3A2820] md:text-5xl">Investment</h2>
-          <p className="mt-4 max-w-[42ch] font-sans text-sm leading-relaxed text-[#3A2820]/80 md:text-base">
-            Transparent pricing, no surprises
-          </p>
-
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {investmentOptions.map((option) => (
-              <article
-                key={option.title}
-                className={`rounded-[24px] bg-[#FAF7F2] p-7 md:p-8 ${
-                  option.featured
-                    ? "border-2 border-[#B8704C]/70 shadow-md shadow-[#B8704C]/15"
-                    : "border border-[#B8704C]/22"
-                }`}
-              >
-                <h3 className="font-serif text-3xl text-[#3A2820]">{option.title}</h3>
-                <p className="mt-4 font-serif text-4xl text-[#3A2820]">{option.price}</p>
-                <p className="mt-4 font-sans text-sm leading-relaxed text-[#3A2820]/80">{option.details}</p>
-                {option.note ? (
-                  <p className="mt-6 inline-block rounded-full bg-[#B8704C]/10 px-4 py-2 font-sans text-[10px] uppercase tracking-[0.2em] text-[#B8704C] md:text-[11px]">
-                    {option.note}
-                  </p>
-                ) : null}
-              </article>
-            ))}
-          </div>
-
-          <p className="mt-6 font-sans text-[10px] uppercase tracking-[0.2em] text-[#3A2820]/60 md:text-[11px]">
-            Final pricing determined at consultation
-          </p>
-        </div>
-      </section>
-
-      <section className="bg-[#F7F1E8] px-6 py-20 md:px-14 lg:px-20" id="membership">
-        <div className="mx-auto grid w-full max-w-6xl gap-10 lg:grid-cols-[0.4fr_0.6fr] lg:gap-12">
-          <div className="self-center">
+        <ScrollReveal as="div" className="mx-auto w-full max-w-6xl">
+          <ScrollRevealItem order={0}>
             <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
-              MEMBERSHIP
+              Investment
             </p>
-            <h2 className="font-serif text-4xl leading-[1.08] text-[#3A2820] md:text-5xl">
-              Made for clients who treat their skin like an investment.
-            </h2>
-            <p className="mt-6 font-sans text-base leading-relaxed text-[#3A2820]/80">
-              The Infinity membership turns one-off visits into a long-term relationship with your skin. Priority
-              access, monthly upkeep, and the kind of pricing that only makes sense if you&apos;re serious about
-              results.
+          </ScrollRevealItem>
+          <ScrollRevealItem order={1}>
+            <h2 className="font-serif text-4xl leading-[1.06] text-[#3A2820] md:text-5xl">Investment</h2>
+          </ScrollRevealItem>
+          <ScrollRevealItem order={2}>
+            <p className="mt-4 max-w-[42ch] font-sans text-sm leading-relaxed text-[#3A2820]/80 md:text-base">
+              Transparent pricing, no surprises
             </p>
-            <button
-              type="button"
-              onClick={openBookingModal}
-              className="mt-7 inline-flex items-center font-sans text-[10px] uppercase tracking-[0.28em] text-[#B8704C] md:text-[11px]"
-            >
-              Become a member →
-            </button>
-          </div>
+          </ScrollRevealItem>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {membershipPerks.map((perk) => {
-              const Icon = perk.icon
-              return (
+          <ScrollRevealItem order={3}>
+            <div className="mt-10 grid gap-6 md:grid-cols-3">
+              {investmentOptions.map((option) => (
                 <article
-                  key={perk.title}
-                  className="rounded-[18px] border border-[#D7BFA7] bg-[#FAF7F2] p-5 shadow-sm shadow-[#3A2820]/7 transition-transform duration-200 hover:-translate-y-0.5"
+                  key={option.title}
+                  className={`rounded-[24px] bg-[#FAF7F2]/80 p-7 md:p-8 ${
+                    option.featured
+                      ? `border-2 border-[#B8704C]/70 ${SHADOW_TIER1}`
+                      : `border ${BORDER_CHAMPAGNE} shadow-none`
+                  }`}
                 >
-                  <div className="mb-4 inline-flex size-8 items-center justify-center rounded-full border border-[#B8704C]/35 text-[#B8704C]">
-                    <Icon size={15} strokeWidth={1.8} />
-                  </div>
-                  <h3 className="font-serif text-[18px] leading-tight text-[#3A2820]">{perk.title}</h3>
-                  <p className="mt-2 font-sans text-[13px] leading-relaxed text-[#3A2820]/72">{perk.description}</p>
+                  <h3 className="font-serif text-3xl text-[#3A2820]">{option.title}</h3>
+                  <p className="mt-4 font-serif text-4xl text-[#3A2820]">{option.price}</p>
+                  <p className="mt-4 font-sans text-sm leading-relaxed text-[#3A2820]/80">{option.details}</p>
+                  {option.note ? (
+                    <p className="mt-6 inline-block rounded-full bg-[#B8704C]/10 px-4 py-2 font-sans text-[10px] uppercase tracking-[0.2em] text-[#B8704C] md:text-[11px]">
+                      {option.note}
+                    </p>
+                  ) : null}
                 </article>
-              )
-            })}
-          </div>
-        </div>
+              ))}
+            </div>
+          </ScrollRevealItem>
+
+          <ScrollRevealItem order={4}>
+            <p className="mt-6 font-sans text-[10px] uppercase tracking-[0.2em] text-[#3A2820]/60 md:text-[11px]">
+              Final pricing determined at consultation
+            </p>
+          </ScrollRevealItem>
+        </ScrollReveal>
       </section>
 
-      <section className="bg-[#FAF7F2] px-6 py-20 md:px-14 lg:px-20" id="find-your-treatment">
-        <div className="mx-auto w-full max-w-6xl">
-          <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
-            Find your treatment
-          </p>
-          <h2 className="font-serif text-4xl leading-[1.06] text-[#3A2820] md:text-5xl">Find your treatment</h2>
-          <p className="mt-4 max-w-[46ch] font-sans text-sm leading-relaxed text-[#3A2820]/80 md:text-base">
-            Answer four questions and we&apos;ll match you with the right protocol.
-          </p>
+      <section className="bg-[#F7F1E8]/80 px-6 py-20 md:px-14 lg:px-20" id="membership">
+        <ScrollReveal as="div" className="mx-auto grid w-full max-w-6xl gap-10 lg:grid-cols-[0.4fr_0.6fr] lg:gap-12">
+          <div className="self-center">
+            <ScrollRevealItem order={0}>
+              <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
+                MEMBERSHIP
+              </p>
+            </ScrollRevealItem>
+            <ScrollRevealItem order={1}>
+              <h2 className="font-serif text-4xl leading-[1.08] text-[#3A2820] md:text-5xl">
+                Made for clients who treat their skin like an investment.
+              </h2>
+            </ScrollRevealItem>
+            <ScrollRevealItem order={2}>
+              <p className="mt-6 font-sans text-base leading-relaxed text-[#3A2820]/80">
+                The Infinity membership turns one-off visits into a long-term relationship with your skin. Priority
+                access, monthly upkeep, and the kind of pricing that only makes sense if you&apos;re serious about
+                results.
+              </p>
+            </ScrollRevealItem>
+            <ScrollRevealItem order={3}>
+              <button
+                type="button"
+                onClick={openBookingModal}
+                className="mt-7 inline-flex items-center font-sans text-[10px] uppercase tracking-[0.28em] text-[#B8704C] md:text-[11px]"
+              >
+                Become a member →
+              </button>
+            </ScrollRevealItem>
+          </div>
 
-          <div className="mx-auto mt-10 w-full max-w-[720px] rounded-[28px] border border-[#D7BFA7] bg-[#FAF7F2] p-6 shadow-md shadow-[#3A2820]/10 md:p-9">
+          <ScrollRevealItem order={4} className="min-w-0">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {membershipPerks.map((perk) => {
+                const Icon = perk.icon
+                return (
+                  <article
+                    key={perk.title}
+                    className={`rounded-[18px] border border-[#D7BFA7] bg-[#FAF7F2]/80 p-5 ${SHADOW_TIER2} transition-transform duration-200 hover:-translate-y-0.5`}
+                  >
+                    <div className="mb-4 inline-flex size-8 items-center justify-center rounded-full border border-[#B8704C]/35 text-[#B8704C]">
+                      <Icon size={15} strokeWidth={1.8} />
+                    </div>
+                    <h3 className="font-serif text-[18px] leading-tight text-[#3A2820]">{perk.title}</h3>
+                    <p className="mt-2 font-sans text-[13px] leading-relaxed text-[#3A2820]/72">{perk.description}</p>
+                  </article>
+                )
+              })}
+            </div>
+          </ScrollRevealItem>
+        </ScrollReveal>
+      </section>
+
+      <section className="px-6 py-20 md:px-14 lg:px-20" id="find-your-treatment">
+        <ScrollReveal as="div" className="mx-auto w-full max-w-6xl">
+          <ScrollRevealItem order={0}>
+            <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
+              Find your treatment
+            </p>
+          </ScrollRevealItem>
+          <ScrollRevealItem order={1}>
+            <h2 className="font-serif text-4xl leading-[1.06] text-[#3A2820] md:text-5xl">Find your treatment</h2>
+          </ScrollRevealItem>
+          <ScrollRevealItem order={2}>
+            <p className="mt-4 max-w-[46ch] font-sans text-sm leading-relaxed text-[#3A2820]/80 md:text-base">
+              Answer four questions and we&apos;ll match you with the right protocol.
+            </p>
+          </ScrollRevealItem>
+
+          <ScrollRevealItem order={3}>
+            <div
+              className={`mx-auto mt-10 w-full max-w-[720px] rounded-[28px] border border-[#D7BFA7] bg-[#FAF7F2]/80 p-6 ${SHADOW_TIER1} md:p-9`}
+            >
             <div className="relative mb-8 min-h-6">
               {quizStep > 0 ? (
                 <button
@@ -1191,333 +1175,210 @@ export default function Page() {
                 </div>
               )}
             </div>
-          </div>
-        </div>
+            </div>
+          </ScrollRevealItem>
+        </ScrollReveal>
       </section>
 
-      <section className="bg-[#FAF7F2] px-6 py-20 md:px-14 lg:px-20" id="studio">
-        <div className="mx-auto grid w-full max-w-6xl gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-12">
-          <div className="grid grid-cols-2 gap-4 md:gap-5">
-            <div className="relative col-span-2 overflow-hidden rounded-[24px] border border-[#B8704C]/18 [aspect-ratio:16/10]">
-              <Image
-                src={studioImages[0].src}
-                alt={studioImages[0].label}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 55vw"
-              />
+      <section className="px-6 py-20 md:px-14 lg:px-20" id="studio">
+        <ScrollReveal as="div" className="mx-auto grid w-full max-w-6xl gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-12">
+          <ScrollRevealItem order={0} className="min-w-0">
+            <div className="grid grid-cols-2 gap-4 md:gap-5">
+              <div className="relative col-span-2 overflow-hidden rounded-[24px] border border-[#B8704C]/18 [aspect-ratio:16/10]">
+                <Image
+                  src={studioImages[0].src}
+                  alt={studioImages[0].label}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 55vw"
+                />
+              </div>
+              <div className="relative overflow-hidden rounded-[24px] border border-[#B8704C]/18 [aspect-ratio:4/5]">
+                <Image
+                  src={studioImages[1].src}
+                  alt={studioImages[1].label}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 50vw, 28vw"
+                />
+              </div>
+              <div className="relative overflow-hidden rounded-[24px] border border-[#B8704C]/18 [aspect-ratio:4/5]">
+                <Image
+                  src={studioImages[2].src}
+                  alt={studioImages[2].label}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 50vw, 28vw"
+                />
+              </div>
             </div>
-            <div className="relative overflow-hidden rounded-[24px] border border-[#B8704C]/18 [aspect-ratio:4/5]">
-              <Image
-                src={studioImages[1].src}
-                alt={studioImages[1].label}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 50vw, 28vw"
-              />
-            </div>
-            <div className="relative overflow-hidden rounded-[24px] border border-[#B8704C]/18 [aspect-ratio:4/5]">
-              <Image
-                src={studioImages[2].src}
-                alt={studioImages[2].label}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 50vw, 28vw"
-              />
-            </div>
-          </div>
+          </ScrollRevealItem>
 
-          <div className="self-center rounded-[24px] border border-[#B8704C]/20 bg-[#EFE3D5]/45 p-7 md:p-8">
-            <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
-              Inside the studio
-            </p>
-            <h2 className="font-serif text-4xl leading-[1.08] text-[#3A2820] md:text-5xl">Inside the studio</h2>
-            <p className="mt-6 font-sans text-base leading-relaxed text-[#3A2820]/80">
-              A boutique space designed for privacy, focus, and results. Located in the heart of Brickell.
-            </p>
-            <p className="mt-6 border-t border-[#B8704C]/20 pt-4 font-sans text-[10px] uppercase tracking-[0.2em] text-[#3A2820]/65 md:text-[11px]">
-              1221 Brickell Ave, Miami, FL - Complimentary garage parking available
-            </p>
-          </div>
-        </div>
+          <ScrollRevealItem order={1} className="min-w-0 self-center">
+            <div className="rounded-[24px] border border-[#B8704C]/20 bg-[#EFE3D5]/45 p-7 md:p-8">
+              <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
+                Inside the studio
+              </p>
+              <h2 className="font-serif text-4xl leading-[1.08] text-[#3A2820] md:text-5xl">Inside the studio</h2>
+              <p className="mt-6 font-sans text-base leading-relaxed text-[#3A2820]/80">
+                A boutique space designed for privacy, focus, and results. Located in the heart of Brickell.
+              </p>
+              <p className="mt-6 border-t border-[#B8704C]/20 pt-4 font-sans text-[10px] uppercase tracking-[0.2em] text-[#3A2820]/65 md:text-[11px]">
+                1221 Brickell Ave, Miami, FL - Complimentary garage parking available
+              </p>
+            </div>
+          </ScrollRevealItem>
+        </ScrollReveal>
       </section>
 
-      <section className="bg-[#FAF7F2] px-6 py-8 md:px-14 md:py-10 lg:px-20" id="featured-in">
-        <div className="mx-auto w-full max-w-6xl text-center">
-          <p className="mb-5 font-sans text-[10px] uppercase tracking-[0.32em] text-[#B8704C]/85 md:text-[11px]">
-            AS FEATURED IN
-          </p>
-          <div className="border-y border-[#B8704C]/20 py-4 md:py-5">
-            <div className="grid grid-cols-2 gap-3 text-[#6E5648]/70 sm:grid-cols-3 md:grid-cols-5 md:gap-6">
-              {featuredInPublications.map((publication) => (
-                <p key={publication} className="font-serif text-2xl leading-none md:text-[2rem]">
-                  {publication}
-                </p>
-              ))}
-            </div>
+      <section className="px-6 py-20 md:px-14 lg:px-20" id="case-studies">
+        <ScrollReveal as="div" className="mx-auto w-full max-w-6xl">
+          <ScrollRevealItem order={0}>
+            <h2 className="font-serif text-4xl leading-[1.06] text-[#3A2820] md:text-5xl">Case studies</h2>
+          </ScrollRevealItem>
+          <ScrollRevealItem order={1}>
+            <p className="mb-10 mt-2 max-w-[40ch] font-sans text-sm leading-relaxed text-[#3A2820]/80 md:mb-12 md:mt-3 md:text-base">
+              Three transformations, examined.
+            </p>
+          </ScrollRevealItem>
+          <div className="grid grid-cols-1 gap-12 md:grid-cols-3 md:gap-8 lg:gap-10">
+            {caseStudies.map((cs, idx) => (
+              <ScrollRevealItem key={cs.headline} order={2 + idx} className="min-w-0">
+                <article className="flex flex-col">
+                  <div className="relative w-full overflow-hidden rounded-[20px] border border-[#B8704C]/15 [aspect-ratio:3/4]">
+                    <Image
+                      src={cs.image}
+                      alt={cs.headline}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                    />
+                  </div>
+                  <p className="mt-4 font-sans text-[9px] uppercase tracking-[0.2em] text-[#B8704C] md:text-[10px]">
+                    {cs.tag}
+                  </p>
+                  <h3 className="mt-2 font-serif text-[1.5rem] leading-snug text-[#3A2820] md:text-[1.75rem]">
+                    {cs.headline}
+                  </h3>
+                  <p className="mt-4 font-serif text-base italic leading-relaxed text-[#3A2820]/90 md:text-[1.05rem]">
+                    &ldquo;{cs.quote}&rdquo;
+                  </p>
+                  <p className="mt-3 font-sans text-[12px] text-[#3A2820]/70 md:text-sm">{cs.attribution}</p>
+                  <p className="mt-4 font-sans text-[10px] uppercase tracking-[0.12em] text-[#3A2820]/50 md:text-[11px]">
+                    {cs.detail}
+                  </p>
+                </article>
+              </ScrollRevealItem>
+            ))}
           </div>
-          <p className="mt-4 font-sans text-[9px] uppercase tracking-[0.26em] text-[#3A2820]/55 md:text-[10px]">
-            SAMPLE PLACEMENT - PROTOTYPE
-          </p>
-        </div>
+        </ScrollReveal>
       </section>
 
-      <section className="bg-[#FAF7F2] px-6 py-20 md:px-14 lg:px-20" id="transformations">
+      <section
+        className="border-t border-[#B8704C]/12 bg-[#EFE3D5]/25 px-6 py-20 md:px-14 lg:px-20"
+        id="in-their-own-words"
+        aria-label="Client proof"
+      >
         <div className="mx-auto w-full max-w-6xl">
-          <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
-            Transformations
-          </p>
-          <h2 className="font-serif text-4xl leading-[1.06] text-[#3A2820] md:text-5xl">Transformations</h2>
-          <p className="mt-4 max-w-[48ch] font-sans text-sm leading-relaxed text-[#3A2820]/80 md:text-base">
-            Real outcomes from Dana&apos;s clients, organized by concern
-          </p>
-
-          <div
-            className="mt-8 mb-8 flex flex-wrap justify-center gap-2 md:mb-10 md:justify-start"
-            role="tablist"
-            aria-label="Transformations categories"
-          >
-            {transformationFilterCategories.map(({ id, label }) => {
-              const isActive = activeTransformationCategory === id
-              return (
-                <button
-                  key={id}
-                  type="button"
-                  role="tab"
-                  id={`transformations-tab-${id}`}
-                  aria-selected={isActive}
-                  onClick={() => selectTransformationCategory(id)}
-                  className={`rounded-full px-5 py-2 font-sans text-[10px] uppercase tracking-[0.2em] transition-colors md:px-6 md:text-[11px] ${
-                    isActive
-                      ? "bg-[#B8704C] text-white"
-                      : "bg-[#FAF7F2] text-[#3A2820] shadow-sm shadow-[#3A2820]/8"
-                  }`}
-                >
-                  {label}
-                </button>
-              )
-            })}
-          </div>
-
-          <div
-            className={`grid grid-cols-1 gap-5 transition-opacity duration-500 ease-out sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 md:gap-6 ${
-              transformationsGridVisible ? "opacity-100" : "opacity-0"
-            }`}
-            aria-hidden={!transformationsGridVisible}
-          >
-            {visibleTransformationPairs.map((pair) => {
-              const percent = cardSplitById[pair.id] ?? 50
-              return (
-                <article key={pair.id} className="w-full">
-                  <div className="relative w-full overflow-hidden rounded-2xl shadow-md shadow-[#3A2820]/12 [aspect-ratio:3/4]">
-                    <div
-                      className="relative h-full w-full select-none"
-                      onMouseMove={(event) =>
-                        updateCardSplit(pair.id, event.clientX, event.currentTarget.getBoundingClientRect())
-                      }
-                    >
+          <ScrollReveal as="div">
+            <ScrollRevealItem order={0}>
+              <h2 className="text-center font-serif text-4xl leading-[1.08] text-[#3A2820] md:text-5xl">
+                In their own words
+              </h2>
+            </ScrollRevealItem>
+            <ScrollRevealItem order={1}>
+              <div className="mt-10 grid gap-6 md:grid-cols-3">
+                {testimonials.map((testimonial) => (
+                  <article
+                    key={testimonial.name}
+                    className={`overflow-hidden rounded-[24px] border border-[#B8704C]/25 bg-[#3A2820] ${SHADOW_TIER1}`}
+                  >
+                    <div className="relative aspect-video">
                       <Image
-                        src={pair.afterImage}
-                        alt="After"
+                        src={testimonial.thumbnail}
+                        alt={`${testimonial.name} testimonial video cover`}
                         fill
-                        className="pointer-events-none absolute inset-0 z-0 object-cover"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover opacity-65"
+                        sizes="(max-width: 768px) 100vw, 33vw"
                       />
-                      <Image
-                        src={pair.beforeImage}
-                        alt="Before"
-                        fill
-                        className="pointer-events-none absolute inset-0 z-[1] object-cover"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        style={{
-                          clipPath: `inset(0 ${100 - percent}% 0 0)`,
-                        }}
-                      />
-                      <span className="pointer-events-none absolute left-4 top-4 z-[2] font-sans text-[10px] uppercase tracking-[0.24em] text-[#FAF7F2] drop-shadow">
-                        Before
-                      </span>
-                      <span className="pointer-events-none absolute right-4 top-4 z-[2] font-sans text-[10px] uppercase tracking-[0.24em] text-[#FAF7F2] drop-shadow">
-                        After
-                      </span>
-                      <div
-                        className="pointer-events-none absolute inset-y-0 z-[3] w-px bg-white/95 shadow-[0_0_10px_rgba(58,40,32,0.35)]"
-                        style={{ left: `${percent}%` }}
-                      >
-                        <span className="absolute left-1/2 top-1/2 block size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/90 bg-white/80" />
+                      <div className="absolute inset-0 bg-[#3A2820]/30" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="grid size-14 place-items-center rounded-full border border-[#FAF7F2]/50 bg-[#FAF7F2]/10 text-[#FAF7F2]">
+                          ▶
+                        </span>
                       </div>
                     </div>
-                  </div>
-                  <p className="mt-3 font-sans text-[10px] uppercase tracking-[0.22em] text-[#3A2820]/72 md:text-[11px]">
-                    {pair.concern} · {pair.treatment}
-                  </p>
-                </article>
-              )
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-[#FAF7F2] px-6 py-20 md:px-14 lg:px-20" id="first-visit-timeline">
-        <div className="mx-auto w-full max-w-6xl">
-          <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
-            Your first visit
-          </p>
-          <h2 className="font-serif text-4xl leading-[1.06] text-[#3A2820] md:text-5xl">Your first visit</h2>
-          <p className="mt-4 max-w-[40ch] font-sans text-sm leading-relaxed text-[#3A2820]/80 md:text-base">
-            Five steps from curiosity to confidence.
-          </p>
-
-          <div className="relative mt-12 pl-10 md:pl-0">
-            <span className="absolute bottom-0 left-4 top-0 w-px bg-[#D7BFA7] md:hidden" aria-hidden />
-            <span className="absolute left-0 right-0 top-1/2 hidden h-px -translate-y-1/2 bg-[#D7BFA7] md:block" aria-hidden />
-
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-5">
-              {firstVisitTimeline.map((step) => {
-                const Icon = step.icon
-                return (
-                  <article
-                    key={step.number}
-                    className="relative rounded-[22px] border border-[#D7BFA7] bg-[#FAF7F2] p-6 shadow-sm shadow-[#3A2820]/8 transition-transform duration-300 hover:-translate-y-1 md:min-h-[280px]"
-                  >
-                    <div className="mb-4 inline-flex size-9 items-center justify-center rounded-full border border-[#B8704C]/35 text-[#B8704C]">
-                      <Icon size={16} strokeWidth={1.7} />
+                    <div className="space-y-2 bg-[#FAF7F2] px-5 py-5">
+                      <p className="font-serif text-2xl text-[#3A2820]">{testimonial.name}</p>
+                      <p className="font-sans text-[10px] uppercase tracking-[0.24em] text-[#3A2820]/70 md:text-[11px]">
+                        Age {testimonial.age} - {testimonial.treatment}
+                      </p>
                     </div>
-                    <p className="font-serif text-3xl leading-none text-[#B8704C]/88">{step.number}</p>
-                    <h3 className="mt-4 font-serif text-[18px] leading-tight text-[#3A2820] md:text-[22px]">
-                      {step.title}
-                    </h3>
-                    <p className="mt-3 font-sans text-[14px] leading-relaxed text-[#3A2820]/80">{step.description}</p>
                   </article>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
+                ))}
+              </div>
+            </ScrollRevealItem>
 
-      <section className="bg-[#EFE3D5]/58 px-6 py-20 md:px-14 lg:px-20" id="reviews-wall">
-        <div className="mx-auto w-full max-w-6xl">
-          <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
-            What clients say
-          </p>
-          <h2 className="font-serif text-4xl leading-[1.06] text-[#3A2820] md:text-5xl">What clients say</h2>
-          <p className="mt-4 max-w-[44ch] font-sans text-sm leading-relaxed text-[#3A2820]/80 md:text-base">
-            Verified reviews from across our channels
-          </p>
+            <ScrollRevealItem order={2}>
+              <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
+                {supportingReviews.map((review) => (
+                  <article
+                    key={`${review.name}-${review.date}`}
+                    className={`rounded-[18px] border ${BORDER_CHAMPAGNE} bg-[#FAF7F2]/50 p-4 shadow-none md:p-5`}
+                  >
+                    <p className="mb-1 font-sans text-[9px] tracking-[0.1em] text-[#B8704C]">★★★★★</p>
+                    <p className="font-serif text-base italic leading-relaxed text-[#3A2820] md:text-base">
+                      {review.quote}
+                    </p>
+                    <p className="mt-3 font-sans text-xs text-[#3A2820] md:text-sm">{review.name}</p>
+                    <p className="mt-0.5 font-sans text-[10px] text-[#3A2820]/50">{review.treatment}</p>
+                  </article>
+                ))}
+              </div>
+            </ScrollRevealItem>
 
-          <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
-            {primaryReviews.map((review) => (
-              <article
-                key={`${review.name}-${review.date}`}
-                className="rounded-[22px] border border-[#D7BFA7] bg-[#FAF7F2] p-6 shadow-sm shadow-[#3A2820]/8"
-              >
-                <p className="font-sans text-sm tracking-[0.12em] text-[#B8704C]">★★★★★</p>
-                <p className="mt-4 font-serif text-2xl leading-relaxed text-[#3A2820] italic">{review.quote}</p>
-                <p className="mt-6 font-sans text-sm text-[#3A2820]">{review.name}</p>
-                <p className="mt-1 font-sans text-[11px] uppercase tracking-[0.12em] text-[#3A2820]/52">
-                  {review.date}
+            <ScrollRevealItem order={3}>
+              <div className="mt-10 border-t border-[#B8704C]/12 pt-8 md:mt-12 md:pt-10">
+                <p className="text-center font-sans text-[9px] uppercase tracking-[0.28em] text-[#3A2820]/40 md:text-[10px]">
+                  As featured in
                 </p>
-                <p className="mt-4 font-sans text-[10px] uppercase tracking-[0.22em] text-[#B8704C] md:text-[11px]">
-                  {review.treatment}
-                </p>
-              </article>
-            ))}
-          </div>
-
-          <div
-            id="reviews-extra"
-            className={`grid overflow-hidden transition-[max-height,opacity,transform] duration-500 ease-out ${
-              reviewsExpanded ? "mt-6 max-h-[1200px] opacity-100 translate-y-0" : "max-h-0 opacity-0 translate-y-3"
-            }`}
-            aria-hidden={!reviewsExpanded}
-          >
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-              {secondaryReviews.map((review) => (
-                <article
-                  key={`${review.name}-${review.date}`}
-                  className="rounded-[22px] border border-[#D7BFA7] bg-[#FAF7F2] p-6 shadow-sm shadow-[#3A2820]/8"
-                >
-                  <p className="font-sans text-sm tracking-[0.12em] text-[#B8704C]">★★★★★</p>
-                  <p className="mt-4 font-serif text-2xl leading-relaxed text-[#3A2820] italic">{review.quote}</p>
-                  <p className="mt-6 font-sans text-sm text-[#3A2820]">{review.name}</p>
-                  <p className="mt-1 font-sans text-[11px] uppercase tracking-[0.12em] text-[#3A2820]/52">
-                    {review.date}
-                  </p>
-                  <p className="mt-4 font-sans text-[10px] uppercase tracking-[0.22em] text-[#B8704C] md:text-[11px]">
-                    {review.treatment}
-                  </p>
-                </article>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-8 flex justify-center">
-            <button
-              type="button"
-              onClick={() => setReviewsExpanded((prev) => !prev)}
-              className="font-sans text-[10px] uppercase tracking-[0.3em] text-[#B8704C] transition-opacity hover:opacity-75 md:text-[11px]"
-              aria-expanded={reviewsExpanded}
-              aria-controls="reviews-extra"
-            >
-              {reviewsExpanded ? "SHOW LESS ↑" : "VIEW MORE REVIEWS →"}
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-[#EFE3D5]/65 px-6 py-20 md:px-14 lg:px-20" id="testimonials">
-        <div className="mx-auto w-full max-w-6xl">
-          <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
-            Testimonials
-          </p>
-          <h2 className="mb-10 font-serif text-4xl leading-[1.06] text-[#3A2820] md:text-5xl">
-            Client Stories in Their Own Words
-          </h2>
-          <div className="grid gap-6 md:grid-cols-3">
-            {testimonials.map((testimonial) => (
-              <article
-                key={testimonial.name}
-                className="overflow-hidden rounded-[24px] border border-[#B8704C]/25 bg-[#3A2820]"
-              >
-                <div className="relative aspect-video">
-                  <Image
-                    src={testimonial.thumbnail}
-                    alt={`${testimonial.name} testimonial video cover`}
-                    fill
-                    className="object-cover opacity-65"
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                  />
-                  <div className="absolute inset-0 bg-[#3A2820]/30" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="grid size-14 place-items-center rounded-full border border-[#FAF7F2]/50 bg-[#FAF7F2]/10 text-[#FAF7F2]">
-                      ▶
+                <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 md:gap-x-8">
+                  {featuredInPublications.map((publication) => (
+                    <span
+                      key={publication}
+                      className="font-serif text-sm text-[#6E5648]/45 md:text-base"
+                    >
+                      {publication}
                     </span>
-                  </div>
+                  ))}
                 </div>
-                <div className="space-y-2 bg-[#FAF7F2] px-5 py-5">
-                  <p className="font-serif text-2xl text-[#3A2820]">{testimonial.name}</p>
-                  <p className="font-sans text-[10px] uppercase tracking-[0.24em] text-[#3A2820]/70 md:text-[11px]">
-                    Age {testimonial.age} - {testimonial.treatment}
-                  </p>
-                </div>
-              </article>
-            ))}
-          </div>
+              </div>
+            </ScrollRevealItem>
+          </ScrollReveal>
         </div>
       </section>
 
       <section className="px-6 py-20 md:px-14 lg:px-20" id="faq">
-        <div className="mx-auto w-full max-w-4xl">
-          <p className="mb-4 text-center font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
-            FAQ
-          </p>
-          <h2 className="mb-10 text-center font-serif text-4xl leading-[1.06] text-[#3A2820] md:text-5xl">
-            Everything You Need Before You Book
-          </h2>
-          <div className="rounded-[26px] border border-[#B8704C]/20 bg-[#FAF7F2] px-6 py-3 md:px-8">
+        <ScrollReveal as="div" className="mx-auto w-full max-w-4xl">
+          <ScrollRevealItem order={0}>
+            <p className="mb-4 text-center font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
+              FAQ
+            </p>
+          </ScrollRevealItem>
+          <ScrollRevealItem order={1}>
+            <h2 className="mb-10 text-center font-serif text-4xl leading-[1.06] text-[#3A2820] md:text-5xl">
+              Everything You Need Before You Book
+            </h2>
+          </ScrollRevealItem>
+          <ScrollRevealItem order={2}>
+            <div className={`rounded-[26px] border ${BORDER_CHAMPAGNE} bg-[#FAF7F2]/60 px-6 py-3 shadow-none md:px-8`}>
             <Accordion type="single" collapsible>
               {faqs.map((faq, idx) => (
-                <AccordionItem key={faq.q} value={`faq-${idx}`} className="border-[#B8704C]/20">
+                <AccordionItem
+                  key={faq.q}
+                  value={`faq-${idx}`}
+                  className="border-b border-[#C9A68E]/30 shadow-none last:border-b-0"
+                >
                   <AccordionTrigger className="font-serif text-xl text-[#3A2820] hover:no-underline md:text-2xl">
                     {faq.q}
                   </AccordionTrigger>
@@ -1527,11 +1388,57 @@ export default function Page() {
                 </AccordionItem>
               ))}
             </Accordion>
-          </div>
-        </div>
+            </div>
+          </ScrollRevealItem>
+        </ScrollReveal>
       </section>
 
-      <section className="relative h-[70vh] overflow-hidden md:h-[90vh]" id="editorial-closer">
+      <section className="px-6 py-20 md:px-14 lg:px-20" id="first-visit-timeline">
+        <ScrollReveal as="div" className="mx-auto w-full max-w-6xl">
+          <ScrollRevealItem order={0}>
+            <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
+              Your first visit
+            </p>
+          </ScrollRevealItem>
+          <ScrollRevealItem order={1}>
+            <h2 className="font-serif text-4xl leading-[1.06] text-[#3A2820] md:text-5xl">Your first visit</h2>
+          </ScrollRevealItem>
+          <ScrollRevealItem order={2}>
+            <p className="mt-4 max-w-[40ch] font-sans text-sm leading-relaxed text-[#3A2820]/80 md:text-base">
+              Five steps from curiosity to confidence.
+            </p>
+          </ScrollRevealItem>
+
+          <div className="relative mt-12 pl-10 md:pl-0">
+            <span className="absolute bottom-0 left-4 top-0 w-px bg-[#D7BFA7] md:hidden" aria-hidden />
+            <span className="absolute left-0 right-0 top-1/2 hidden h-px -translate-y-1/2 bg-[#D7BFA7] md:block" aria-hidden />
+
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-5">
+              {firstVisitTimeline.map((step, i) => {
+                const Icon = step.icon
+                return (
+                  <ScrollRevealItem key={step.number} order={3 + i} className="min-w-0">
+                    <article
+                      className={`relative rounded-[22px] border border-[#D7BFA7] bg-[#FAF7F2]/80 p-6 ${SHADOW_TIER2} transition-transform duration-300 hover:-translate-y-1 md:min-h-[280px]`}
+                    >
+                      <div className="mb-4 inline-flex size-9 items-center justify-center rounded-full border border-[#B8704C]/35 text-[#B8704C]">
+                        <Icon size={16} strokeWidth={1.7} />
+                      </div>
+                      <p className="font-serif text-3xl leading-none text-[#B8704C]/88">{step.number}</p>
+                      <h3 className="mt-4 font-serif text-[18px] leading-tight text-[#3A2820] md:text-[22px]">
+                        {step.title}
+                      </h3>
+                      <p className="mt-3 font-sans text-[14px] leading-relaxed text-[#3A2820]/80">{step.description}</p>
+                    </article>
+                  </ScrollRevealItem>
+                )
+              })}
+            </div>
+          </div>
+        </ScrollReveal>
+      </section>
+
+      <section className="relative h-[70vh] overflow-hidden md:h-[90vh]" id="editorial-closer" aria-label="Editorial feature">
         <Image
           src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=1600&q=85"
           alt="Warm editorial beauty portrait"
@@ -1541,25 +1448,36 @@ export default function Page() {
         />
         <div className="absolute inset-0 bg-[#3A2820]/55" />
 
-        <div className="relative z-[1] flex h-full items-center justify-center px-6 text-center md:px-10">
+        <ScrollReveal
+          as="div"
+          className="relative z-[2] flex h-full items-center justify-center px-6 text-center md:px-10"
+        >
           <div className="mx-auto w-full max-w-[720px]">
-            <p className="font-sans text-[12px] uppercase tracking-[0.32em] text-[#E9D2BE]">BEGIN</p>
-            <h2 className="mt-4 font-serif text-[40px] leading-[1.1] text-[#FAF7F2] md:text-[64px]">
-              Your face deserves a plan, not a menu.
-            </h2>
-            <p className="mx-auto mt-6 max-w-[540px] font-sans text-base leading-[1.6] text-[#F3E8DC] md:text-[18px]">
-              Every protocol at Infinity Beauty Lab is built around your skin, your timeline, and the result you
-              actually want. No upselling. No templates. Just Dana, your concerns, and a strategy.
-            </p>
-            <button
-              type="button"
-              onClick={openBookingModal}
-              className="mt-9 inline-flex items-center justify-center border border-[#D4956F]/40 bg-[#B8704C] px-9 py-4 font-sans text-[10px] uppercase tracking-[0.28em] text-[#FAF7F2] transition-colors hover:bg-[#B8704C]/85 md:text-[11px]"
-            >
-              Reserve your consultation
-            </button>
+            <ScrollRevealItem order={0}>
+              <p className="font-sans text-[12px] uppercase tracking-[0.32em] text-[#E9D2BE]">BEGIN</p>
+            </ScrollRevealItem>
+            <ScrollRevealItem order={1}>
+              <h2 className="mt-4 font-serif text-[40px] leading-[1.1] text-[#FAF7F2] md:text-[64px]">
+                Your face deserves a plan, not a menu.
+              </h2>
+            </ScrollRevealItem>
+            <ScrollRevealItem order={2}>
+              <p className="mx-auto mt-6 max-w-[540px] font-sans text-base leading-[1.6] text-[#F3E8DC] md:text-[18px]">
+                Every protocol at Infinity Beauty Lab is built around your skin, your timeline, and the result you
+                actually want. No upselling. No templates. Just Dana, your concerns, and a strategy.
+              </p>
+            </ScrollRevealItem>
+            <ScrollRevealItem order={3}>
+              <button
+                type="button"
+                onClick={openBookingModal}
+                className={`mt-9 inline-flex items-center justify-center border border-[#D4956F]/40 bg-[#B8704C] px-9 py-4 font-sans text-[10px] uppercase tracking-[0.28em] text-[#FAF7F2] ${SHADOW_TIER1} transition-colors hover:bg-[#B8704C]/85 md:text-[11px]`}
+              >
+                Reserve your consultation
+              </button>
+            </ScrollRevealItem>
           </div>
-        </div>
+        </ScrollReveal>
 
         <div className="pointer-events-none absolute bottom-7 left-1/2 z-[1] flex -translate-x-1/2 flex-col items-center gap-2 md:bottom-9">
           <span className="h-8 w-px bg-[#E9D2BE]/80" />
@@ -1567,29 +1485,38 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="border-t border-[#B8704C]/20 bg-[#3A2820] px-6 py-20 text-[#FAF7F2] md:px-14 lg:px-20" id="book">
-        <div className="mx-auto grid w-full max-w-6xl gap-10 lg:grid-cols-[1fr_0.9fr]">
+      <section className="relative z-[2] border-t border-[#B8704C]/20 bg-[#3A2820] px-6 py-20 text-[#FAF7F2] md:px-14 lg:px-20" id="book">
+        <ScrollReveal as="div" className="mx-auto grid w-full max-w-6xl gap-10 lg:grid-cols-[1fr_0.9fr]">
           <div>
-            <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#D4956F] md:text-[11px]">
-              Book Your Visit
-            </p>
-            <h2 className="max-w-[14ch] font-serif text-4xl leading-[1.08] md:text-5xl">
-              Start Your Personalized Skin Plan
-            </h2>
-            <p className="mt-6 max-w-[44ch] font-sans text-sm leading-relaxed text-[#FAF7F2]/70 md:text-base">
-              Reserve a consultation and receive a tailored treatment roadmap based on your goals, skin condition,
-              and lifestyle.
-            </p>
-            <button
-              type="button"
-              onClick={openBookingModal}
-              className="mt-8 inline-block border border-[#D4956F]/40 bg-[#B8704C] px-8 py-4 font-sans text-[10px] uppercase tracking-[0.28em] text-[#FAF7F2] transition-colors hover:bg-[#B8704C]/85 md:text-[11px]"
-            >
-              Reserve Your Consultation
-            </button>
+            <ScrollRevealItem order={0}>
+              <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#D4956F] md:text-[11px]">
+                Book Your Visit
+              </p>
+            </ScrollRevealItem>
+            <ScrollRevealItem order={1}>
+              <h2 className="max-w-[14ch] font-serif text-4xl leading-[1.08] md:text-5xl">
+                Start Your Personalized Skin Plan
+              </h2>
+            </ScrollRevealItem>
+            <ScrollRevealItem order={2}>
+              <p className="mt-6 max-w-[44ch] font-sans text-sm leading-relaxed text-[#FAF7F2]/70 md:text-base">
+                Reserve a consultation and receive a tailored treatment roadmap based on your goals, skin condition,
+                and lifestyle.
+              </p>
+            </ScrollRevealItem>
+            <ScrollRevealItem order={3}>
+              <button
+                type="button"
+                onClick={openBookingModal}
+                className="mt-8 inline-block border border-[#D4956F]/40 bg-[#B8704C] px-8 py-4 font-sans text-[10px] uppercase tracking-[0.28em] text-[#FAF7F2] transition-colors hover:bg-[#B8704C]/85 md:text-[11px]"
+              >
+                Reserve Your Consultation
+              </button>
+            </ScrollRevealItem>
           </div>
 
-          <div className="space-y-6 rounded-[24px] border border-[#D4956F]/30 bg-[#FAF7F2]/5 p-6 md:p-7">
+          <ScrollRevealItem order={4} className="min-w-0">
+            <div className="space-y-6 rounded-[24px] border border-[#D4956F]/30 bg-[#FAF7F2]/5 p-6 md:p-7">
             <div>
               <p className="font-sans text-[10px] uppercase tracking-[0.25em] text-[#D4956F] md:text-[11px]">Address</p>
               <p className="mt-2 font-serif text-2xl text-[#FAF7F2]">1221 Brickell Ave, Miami, FL</p>
@@ -1608,8 +1535,9 @@ export default function Page() {
               </p>
               <div className="mt-3 h-32 rounded-lg bg-[#FAF7F2]/10" />
             </div>
-          </div>
-        </div>
+            </div>
+          </ScrollRevealItem>
+        </ScrollReveal>
 
         <footer className="mx-auto mt-14 flex w-full max-w-6xl flex-col gap-4 border-t border-[#D4956F]/25 pt-8 md:flex-row md:items-center md:justify-between">
           <p className="font-serif text-xl text-[#FAF7F2]">Infinity Beauty Lab</p>
@@ -1626,9 +1554,9 @@ export default function Page() {
         aria-hidden={!bookingModalOpen}
         onClick={closeBookingModal}
       >
-        <div className="flex h-full items-center justify-center p-6">
+        <div className="relative z-[80] flex h-full items-center justify-center p-6">
           <div
-            className={`relative my-auto flex max-h-[88vh] w-[92%] flex-col overflow-hidden rounded-[16px] bg-[#FAF7F2] p-6 transition-all duration-[220ms] ease-out md:w-full md:max-w-[520px] md:p-8 ${
+            className={`relative my-auto flex max-h-[88vh] w-[92%] flex-col overflow-hidden rounded-[16px] bg-[#FAF7F2] p-6 ${SHADOW_TIER1} transition-all duration-[220ms] ease-out md:w-full md:max-w-[520px] md:p-8 ${
               bookingModalOpen ? "scale-100 opacity-100" : "scale-[0.96] opacity-0"
             }`}
             onClick={(event) => event.stopPropagation()}
