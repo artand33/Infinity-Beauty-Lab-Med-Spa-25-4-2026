@@ -20,7 +20,6 @@ const jost = Jost({
 export const metadata: Metadata = {
   title: 'Infinity Beauty Lab — Brickell, Miami',
   description: 'Brickell\'s boutique medical aesthetics studio. Morpheus8, Lumecca IPL, RF Skin Tightening and more.',
-  generator: 'v0.app',
   icons: {
     icon: [
       {

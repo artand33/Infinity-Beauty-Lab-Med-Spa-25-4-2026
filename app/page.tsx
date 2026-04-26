@@ -17,6 +17,7 @@ import {
 } from "lucide-react"
 
 import Hero from "@/components/hero"
+import { PressMarkRow } from "@/components/press-marks"
 import {
   BORDER_CHAMPAGNE,
   ScrollReveal,
@@ -81,8 +82,6 @@ type QuizConcern = "texture" | "pigmentation" | "laxity" | "acne-scars"
 type QuizAge = "under-30" | "30-40" | "40-50" | "50-plus"
 type QuizDowntime = "none" | "day-or-two" | "up-to-week"
 type QuizInvestment = "single" | "package" | "membership"
-
-const featuredInPublications = ["Vogue", "Elle", "Allure", "Harper's Bazaar", "Forbes Health"]
 
 const caseStudies = [
   {
@@ -1342,16 +1341,7 @@ export default function Page() {
                 <p className="text-center font-sans text-[9px] uppercase tracking-[0.28em] text-[#3A2820]/40 md:text-[10px]">
                   As featured in
                 </p>
-                <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 md:gap-x-8">
-                  {featuredInPublications.map((publication) => (
-                    <span
-                      key={publication}
-                      className="font-serif text-sm text-[#6E5648]/45 md:text-base"
-                    >
-                      {publication}
-                    </span>
-                  ))}
-                </div>
+                <PressMarkRow />
               </div>
             </ScrollRevealItem>
           </ScrollReveal>
@@ -1529,11 +1519,16 @@ export default function Page() {
                 Saturday 10:00AM-3:00PM
               </p>
             </div>
-            <div className="rounded-xl border border-dashed border-[#D4956F]/40 p-5">
-              <p className="font-sans text-[10px] uppercase tracking-[0.25em] text-[#D4956F] md:text-[11px]">
-                Map Placeholder
-              </p>
-              <div className="mt-3 h-32 rounded-lg bg-[#FAF7F2]/10" />
+            <div className="relative w-full min-h-[200px] overflow-hidden rounded-[12px] border border-[#D4956F]/30 aspect-[4/3]">
+              <iframe
+                title="Infinity Beauty Lab — 1221 Brickell Ave, Miami on Google Maps"
+                src="https://www.google.com/maps?q=1221+Brickell+Ave,+Miami,+FL+33131&z=16&output=embed"
+                className="absolute inset-0 h-full w-full border-0"
+                style={{ border: 0, borderRadius: 12 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
             </div>
             </div>
           </ScrollRevealItem>

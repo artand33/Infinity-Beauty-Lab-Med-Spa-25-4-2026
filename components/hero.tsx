@@ -66,7 +66,7 @@ export default function Hero({ onOpenBookingModal }: HeroProps) {
         return
       }
 
-      // Sample the top strip away from the fixed hamburger (top-right). The menu
+      // Probe the top strip away from the fixed hamburger (top-right). The menu
       // button lives inside #hero in the DOM, so elementFromPoint + closest("section")
       // always resolved to hero.
       const probeX = window.innerWidth / 2
