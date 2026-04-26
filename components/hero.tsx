@@ -1,8 +1,108 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import Image from "next/image"
 
-export default function Hero() {
+type HeroProps = {
+  onOpenBookingModal: () => void
+}
+
+const mobileNavItems = [
+  { label: "Treatments", targetId: "treatments" },
+  { label: "Before & After", targetId: "before-after" },
+  { label: "Meet Dana", targetId: "meet-dana" },
+  { label: "Investment", targetId: "investment" },
+  { label: "Membership", targetId: "membership" },
+  { label: "Find your treatment", targetId: "find-your-treatment" },
+  { label: "Inside the studio", targetId: "studio" },
+  { label: "Reviews", targetId: "reviews-wall" },
+  { label: "FAQ", targetId: "faq" },
+  { label: "Book your visit", targetId: "book" },
+]
+
+export default function Hero({ onOpenBookingModal }: HeroProps) {
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
+  const [isHamburgerOnDarkSection, setIsHamburgerOnDarkSection] = useState(true)
+
+  useEffect(() => {
+    if (!mobileDrawerOpen) return
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMobileDrawerOpen(false)
+      }
+    }
+
+    const originalOverflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    window.addEventListener("keydown", handleEscape)
+
+    return () => {
+      document.body.style.overflow = originalOverflow
+      window.removeEventListener("keydown", handleEscape)
+    }
+  }, [mobileDrawerOpen])
+
+  useEffect(() => {
+    let frameId: number | null = null
+    const darkSectionIds = ["hero", "editorial-closer", "book"] as const
+
+    const isPointInDarkSections = (x: number, y: number) => {
+      for (const id of darkSectionIds) {
+        const el = document.getElementById(id)
+        if (!el) continue
+        const r = el.getBoundingClientRect()
+        if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
+          return true
+        }
+      }
+      return false
+    }
+
+    const updateHamburgerTone = () => {
+      if (!window.matchMedia("(max-width: 767px)").matches) {
+        setIsHamburgerOnDarkSection(true)
+        return
+      }
+
+      // Sample the top strip away from the fixed hamburger (top-right). The menu
+      // button lives inside #hero in the DOM, so elementFromPoint + closest("section")
+      // always resolved to hero.
+      const probeX = window.innerWidth / 2
+      const probeY = 36
+      setIsHamburgerOnDarkSection(isPointInDarkSections(probeX, probeY))
+    }
+
+    const handleViewportChange = () => {
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId)
+      }
+      frameId = window.requestAnimationFrame(() => {
+        updateHamburgerTone()
+      })
+    }
+
+    updateHamburgerTone()
+    window.addEventListener("scroll", handleViewportChange, { passive: true })
+    window.addEventListener("resize", handleViewportChange)
+
+    return () => {
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId)
+      }
+      window.removeEventListener("scroll", handleViewportChange)
+      window.removeEventListener("resize", handleViewportChange)
+    }
+  }, [])
+
+  const handleMobileNavClick = (targetId: string) => {
+    document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "start" })
+    setMobileDrawerOpen(false)
+  }
+
   return (
     <section
+      id="hero"
       className="relative w-full min-h-screen flex flex-col"
       aria-label="Infinity Beauty Lab hero section"
     >
@@ -54,14 +154,6 @@ export default function Hero() {
           ))}
         </nav>
 
-        {/* Mobile menu icon */}
-        <button
-          className="md:hidden flex flex-col gap-1.5 p-1"
-          aria-label="Open navigation menu"
-        >
-          <span className="block w-6 h-px bg-white/70" />
-          <span className="block w-4 h-px bg-white/70" />
-        </button>
       </header>
 
       {/* Hero content — vertically centered */}
@@ -98,8 +190,9 @@ export default function Hero() {
 
         {/* CTA cluster */}
         <div className="flex flex-col items-center gap-5">
-          <a
-            href="#"
+          <button
+            type="button"
+            onClick={onOpenBookingModal}
             className="group relative inline-flex items-center justify-center
               font-sans text-[11px] md:text-[12px] font-medium tracking-[0.3em] uppercase
               text-white border border-white/20
@@ -118,7 +211,7 @@ export default function Hero() {
               }}
             />
             <span className="relative">Reserve Your Consultation</span>
-          </a>
+          </button>
 
           {/* Treatment tags */}
           <p
@@ -164,6 +257,60 @@ export default function Hero() {
           </div>
         </div>
       </div>
+
+      <button
+        type="button"
+        className={`fixed right-4 top-4 z-[90] flex flex-col gap-1.5 p-1 transition-[opacity,color] duration-200 md:hidden ${
+          isHamburgerOnDarkSection ? "text-white" : "text-[#B8704C]"
+        } ${mobileDrawerOpen ? "pointer-events-none opacity-0" : "opacity-100"}`}
+        aria-label="Open navigation menu"
+        aria-expanded={mobileDrawerOpen}
+        onClick={() => setMobileDrawerOpen(true)}
+      >
+        <span className="block h-px w-6 bg-current opacity-90 transition-[background-color] duration-200 ease-out" />
+        <span className="block h-px w-4 bg-current transition-[background-color] duration-200 ease-out" />
+      </button>
+
+      <div
+        className={`fixed inset-0 z-40 bg-[#3A2820]/60 transition-opacity duration-300 ease-out md:hidden ${
+          mobileDrawerOpen ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+        aria-hidden={!mobileDrawerOpen}
+        onClick={() => setMobileDrawerOpen(false)}
+      />
+      <aside
+        className={`fixed right-0 top-0 z-50 h-full w-[80vw] max-w-[380px] bg-[#FAF7F2] px-6 py-8 shadow-2xl shadow-[#3A2820]/25 transition-transform duration-300 ease-out md:hidden ${
+          mobileDrawerOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+        aria-label="Mobile navigation drawer"
+        aria-hidden={!mobileDrawerOpen}
+      >
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => setMobileDrawerOpen(false)}
+            className="inline-flex size-8 items-center justify-center text-[#B8704C]"
+            aria-label="Close navigation menu"
+          >
+            <span className="text-lg leading-none">×</span>
+          </button>
+        </div>
+        <nav className="mt-4">
+          <ul className="divide-y divide-[#D7BFA7] border-y border-[#D7BFA7]">
+            {mobileNavItems.map((item) => (
+              <li key={item.targetId}>
+                <button
+                  type="button"
+                  onClick={() => handleMobileNavClick(item.targetId)}
+                  className="flex min-h-[60px] w-full items-center py-3 text-left font-serif text-[1.1rem] text-[#3A2820]"
+                >
+                  {item.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </aside>
     </section>
   )
 }

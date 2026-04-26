@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { type ChangeEvent, type FormEvent, useEffect, useState } from "react"
 import Image from "next/image"
 import {
   Calendar,
@@ -13,9 +13,17 @@ import {
   Phone,
   ScanFace,
   Sparkles,
+  Check,
 } from "lucide-react"
 
 import Hero from "@/components/hero"
+import {
+  BORDER_CHAMPAGNE,
+  ScrollReveal,
+  ScrollRevealItem,
+  SHADOW_TIER1,
+  SHADOW_TIER2,
+} from "@/components/scroll-reveal"
 import {
   Accordion,
   AccordionContent,
@@ -431,6 +439,17 @@ const quizSteps = [
   },
 ]
 
+const preferredTreatments = [
+  "Not sure yet",
+  "Morpheus8",
+  "Lumecca IPL",
+  "RF Skin Tightening",
+  "Microneedling",
+  "Membership consultation",
+]
+
+const preferredTimes = ["Morning", "Afternoon", "Evening"]
+
 export default function Page() {
   const [activeBeforeAfterCategory, setActiveBeforeAfterCategory] =
     useState<BeforeAfterCategory>("face")
@@ -457,6 +476,20 @@ export default function Page() {
   const [cardSplitById, setCardSplitById] = useState<Record<string, number>>(() =>
     Object.fromEntries([...beforeAfterPairs, ...transformationPairs].map((p) => [p.id, 50])),
   )
+  const [bookingModalOpen, setBookingModalOpen] = useState(false)
+  const [bookingSubmitted, setBookingSubmitted] = useState(false)
+  const [bookingStep, setBookingStep] = useState(0)
+  const [bookingPanelVisible, setBookingPanelVisible] = useState(true)
+  const [bookingTransitionDirection, setBookingTransitionDirection] = useState<1 | -1>(1)
+  const [bookingFormData, setBookingFormData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    preferredTreatment: "",
+    preferredDate: "",
+    preferredTime: "",
+    message: "",
+  })
 
   const visibleBeforeAfterPairs = beforeAfterPairs.filter(
     (p) => p.category === activeBeforeAfterCategory,
@@ -466,6 +499,25 @@ export default function Page() {
   )
   const primaryReviews = reviews.slice(0, 3)
   const secondaryReviews = reviews.slice(3)
+
+  useEffect(() => {
+    if (!bookingModalOpen) return
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setBookingModalOpen(false)
+      }
+    }
+
+    const originalOverflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    window.addEventListener("keydown", handleEscape)
+
+    return () => {
+      document.body.style.overflow = originalOverflow
+      window.removeEventListener("keydown", handleEscape)
+    }
+  }, [bookingModalOpen])
 
   const selectBeforeAfterCategory = (next: BeforeAfterCategory) => {
     if (next === activeBeforeAfterCategory) return
@@ -562,10 +614,76 @@ export default function Page() {
     transitionToQuizStep(quizStep - 1, -1)
   }
 
-  const scrollToBooking = () => {
-    const bookingSection = document.getElementById("book")
-    bookingSection?.scrollIntoView({ behavior: "smooth", block: "start" })
+  const openBookingModal = () => {
+    setBookingStep(0)
+    setBookingPanelVisible(true)
+    setBookingTransitionDirection(1)
+    setBookingSubmitted(false)
+    setBookingFormData({
+      fullName: "",
+      email: "",
+      phone: "",
+      preferredTreatment: "",
+      preferredDate: "",
+      preferredTime: "",
+      message: "",
+    })
+    setBookingModalOpen(true)
   }
+
+  const closeBookingModal = () => {
+    setBookingModalOpen(false)
+  }
+
+  const handleBookingFieldChange = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+  ) => {
+    const { name, value } = event.target
+    setBookingFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  const handleBookingSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setBookingSubmitted(true)
+  }
+
+  const transitionToBookingStep = (nextStep: number, direction: 1 | -1 = 1) => {
+    setBookingTransitionDirection(direction)
+    setBookingPanelVisible(false)
+    window.setTimeout(() => {
+      setBookingStep(nextStep)
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setBookingPanelVisible(true))
+      })
+    }, 200)
+  }
+
+  const handleBookingContinue = () => {
+    if (bookingStep === 0) {
+      transitionToBookingStep(1, 1)
+      return
+    }
+    if (bookingStep === 1) {
+      transitionToBookingStep(2, 1)
+    }
+  }
+
+  const handleBookingBack = () => {
+    if (bookingStep === 0) return
+    transitionToBookingStep(bookingStep - 1, -1)
+  }
+
+  const isBookingStepOneComplete =
+    bookingFormData.preferredTreatment.trim() !== "" &&
+    bookingFormData.preferredDate.trim() !== "" &&
+    bookingFormData.preferredTime.trim() !== ""
+  const isBookingStepTwoComplete =
+    bookingFormData.fullName.trim() !== "" &&
+    bookingFormData.email.trim() !== "" &&
+    bookingFormData.phone.trim() !== ""
 
   const updateCardSplit = (id: string, clientX: number, cardRect: DOMRect) => {
     const mouseX = clientX - cardRect.left
@@ -575,74 +693,83 @@ export default function Page() {
   }
 
   return (
-    <main className="bg-[#FAF7F2] text-[#3A2820]">
-      <Hero />
+    <main className="relative z-[2] bg-transparent text-[#3A2820]">
+      <Hero onOpenBookingModal={openBookingModal} />
 
-      <section className="border-y border-[#B8704C]/15 bg-[#EFE3D5] px-6 py-8 md:px-14 lg:px-20">
-        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-center gap-4 md:gap-6">
-          {trustItems.map((item) => (
-            <div
-              key={item}
-              className="rounded-full border border-[#B8704C]/35 px-5 py-2 text-center font-sans text-[10px] uppercase tracking-[0.28em] text-[#3A2820]/85 md:px-7 md:py-3 md:text-[11px]"
-            >
-              {item}
+      <section className="border-y border-[#B8704C]/15 bg-[#EFE3D5]/80 px-6 py-8 md:px-14 lg:px-20">
+        <ScrollReveal as="div" className="mx-auto w-full max-w-6xl">
+          <ScrollRevealItem order={0}>
+            <div className="flex w-full flex-wrap items-center justify-center gap-4 md:gap-6">
+              {trustItems.map((item) => (
+                <div
+                  key={item}
+                  className={`rounded-full border ${BORDER_CHAMPAGNE} bg-[#FAF7F2]/50 px-5 py-2 text-center font-sans text-[10px] uppercase tracking-[0.28em] text-[#3A2820]/85 md:px-7 md:py-3 md:text-[11px]`}
+                >
+                  {item}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </ScrollRevealItem>
+        </ScrollReveal>
       </section>
 
       <section
-        className="bg-[#FAF7F2] px-6 py-20 md:px-14 lg:px-20"
+        className="px-6 py-20 md:px-14 lg:px-20"
         id="before-after"
       >
-        <div className="mx-auto w-full max-w-6xl">
-          <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
-            Before &amp; After
-          </p>
-          <h2 className="mb-8 font-serif text-4xl leading-[1.06] text-[#3A2820] md:mb-10 md:text-5xl">
-            Real Results, Naturally Refined
-          </h2>
+        <ScrollReveal as="div" className="mx-auto w-full max-w-6xl">
+          <ScrollRevealItem order={0}>
+            <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
+              Before &amp; After
+            </p>
+          </ScrollRevealItem>
+          <ScrollRevealItem order={1}>
+            <h2 className="mb-8 font-serif text-4xl leading-[1.06] text-[#3A2820] md:mb-10 md:text-5xl">
+              Real Results, Naturally Refined
+            </h2>
+          </ScrollRevealItem>
 
-          <div
-            className="mb-8 flex flex-wrap justify-center gap-2 md:mb-10 md:justify-start"
-            role="tablist"
-            aria-label="Before and after categories"
-          >
-            {beforeAfterFilterCategories.map(({ id, label }) => {
-              const isActive = activeBeforeAfterCategory === id
-              return (
-                <button
-                  key={id}
-                  type="button"
-                  role="tab"
-                  id={`before-after-tab-${id}`}
-                  aria-selected={isActive}
-                  onClick={() => selectBeforeAfterCategory(id)}
-                  className={`rounded-full px-5 py-2 font-sans text-[10px] uppercase tracking-[0.2em] transition-colors md:px-6 md:text-[11px] ${
-                    isActive
-                      ? "bg-[#B8704C] text-white"
-                      : "bg-[#FAF7F2] text-[#3A2820] shadow-sm shadow-[#3A2820]/8"
-                  }`}
-                >
-                  {label}
-                </button>
-              )
-            })}
-          </div>
+          <ScrollRevealItem order={2}>
+            <div
+              className="mb-8 flex flex-wrap justify-center gap-2 md:mb-10 md:justify-start"
+              role="tablist"
+              aria-label="Before and after categories"
+            >
+              {beforeAfterFilterCategories.map(({ id, label }) => {
+                const isActive = activeBeforeAfterCategory === id
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    role="tab"
+                    id={`before-after-tab-${id}`}
+                    aria-selected={isActive}
+                    onClick={() => selectBeforeAfterCategory(id)}
+                    className={`rounded-full px-5 py-2 font-sans text-[10px] uppercase tracking-[0.2em] transition-colors md:px-6 md:text-[11px] ${
+                      isActive
+                        ? "bg-[#B8704C] text-white"
+                        : `border ${BORDER_CHAMPAGNE} bg-[#FAF7F2]/60 text-[#3A2820]`
+                    }`}
+                  >
+                    {label}
+                  </button>
+                )
+              })}
+            </div>
 
-          <div
-            className={`grid grid-cols-1 gap-5 transition-opacity duration-500 ease-out sm:grid-cols-3 sm:gap-4 md:gap-6 ${
-              beforeAfterGridVisible ? "opacity-100" : "opacity-0"
-            }`}
-            aria-hidden={!beforeAfterGridVisible}
-          >
+            <div
+              className={`grid grid-cols-1 gap-5 transition-opacity duration-500 ease-out sm:grid-cols-3 sm:gap-4 md:gap-6 ${
+                beforeAfterGridVisible ? "opacity-100" : "opacity-0"
+              }`}
+              aria-hidden={!beforeAfterGridVisible}
+            >
             {visibleBeforeAfterPairs.map((pair) => {
               const percent = cardSplitById[pair.id] ?? 50
 
               return (
                 <article
                   key={pair.id}
-                  className="relative w-full max-w-sm justify-self-center overflow-hidden rounded-2xl shadow-md shadow-[#3A2820]/12 [aspect-ratio:3/4] sm:max-w-none"
+                  className={`relative w-full max-w-sm justify-self-center overflow-hidden rounded-2xl ${SHADOW_TIER2} [aspect-ratio:3/4] sm:max-w-none`}
                 >
                   <div
                     className="relative h-full w-full select-none"
@@ -685,147 +812,189 @@ export default function Page() {
                 </article>
               )
             })}
-          </div>
-        </div>
+            </div>
+          </ScrollRevealItem>
+        </ScrollReveal>
       </section>
 
       <section className="bg-[#EFE3D5]/65 px-6 py-20 md:px-14 lg:px-20" id="treatments">
-        <div className="mx-auto w-full max-w-6xl">
-          <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
-            Treatments
-          </p>
-          <h2 className="mb-10 font-serif text-4xl leading-[1.06] text-[#3A2820] md:text-5xl">
-            Precision Protocols for Signature Skin
-          </h2>
-          <div className="grid gap-6 md:grid-cols-3">
-            {treatments.map((treatment) => (
-              <article
-                key={treatment.title}
-                className="rounded-[26px] border border-[#B8704C]/20 bg-[#FAF7F2] p-7 md:p-8"
-              >
-                <h3 className="font-serif text-3xl text-[#3A2820]">{treatment.title}</h3>
-                <p className="mt-4 font-sans text-sm leading-relaxed text-[#3A2820]/80">{treatment.blurb}</p>
-                <a
-                  href="#book"
-                  className="mt-6 inline-block font-sans text-[10px] uppercase tracking-[0.28em] text-[#B8704C] md:text-[11px]"
+        <ScrollReveal as="div" className="mx-auto w-full max-w-6xl">
+          <ScrollRevealItem order={0}>
+            <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
+              Treatments
+            </p>
+          </ScrollRevealItem>
+          <ScrollRevealItem order={1}>
+            <h2 className="mb-10 font-serif text-4xl leading-[1.06] text-[#3A2820] md:text-5xl">
+              Precision Protocols for Signature Skin
+            </h2>
+          </ScrollRevealItem>
+          <ScrollRevealItem order={2}>
+            <div className="grid gap-6 md:grid-cols-3">
+              {treatments.map((treatment) => (
+                <article
+                  key={treatment.title}
+                  className={`rounded-[26px] border border-[#B8704C]/20 bg-[#FAF7F2]/80 p-7 ${SHADOW_TIER2} md:p-8`}
                 >
-                  Explore Treatment
-                </a>
-              </article>
-            ))}
-          </div>
-        </div>
+                  <h3 className="font-serif text-3xl text-[#3A2820]">{treatment.title}</h3>
+                  <p className="mt-4 font-sans text-sm leading-relaxed text-[#3A2820]/80">{treatment.blurb}</p>
+                  <a
+                    href="#book"
+                    className="mt-6 inline-block font-sans text-[10px] uppercase tracking-[0.28em] text-[#B8704C] md:text-[11px]"
+                  >
+                    Explore Treatment
+                  </a>
+                </article>
+              ))}
+            </div>
+          </ScrollRevealItem>
+        </ScrollReveal>
       </section>
 
       <section className="px-6 py-20 md:px-14 lg:px-20" id="meet-dana">
-        <div className="mx-auto grid w-full max-w-6xl items-center gap-10 rounded-[30px] border border-[#B8704C]/20 bg-[#FAF7F2] p-6 md:p-10 lg:grid-cols-2">
-          <div className="relative mx-auto aspect-[4/5] w-full max-w-[430px] overflow-hidden rounded-[22px] border border-[#B8704C]/20">
-            <Image
-              src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&q=80"
-              alt="Dana, founder of Infinity Beauty Lab"
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 40vw"
-            />
-          </div>
-          <div>
-            <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
-              Meet Dana
-            </p>
-            <h2 className="font-serif text-4xl leading-[1.08] text-[#3A2820] md:text-5xl">
-              Founder-Led Care With Clinical Precision
-            </h2>
-            <p className="mt-6 font-sans text-base leading-relaxed text-[#3A2820]/80">
-              Dana combines evidence-based aesthetic medicine with a boutique, high-touch approach designed for
-              natural-looking outcomes. Every treatment plan is created for your skin, your schedule, and your long
-              term goals.
-            </p>
-            <div className="mt-7 grid gap-3 sm:grid-cols-2">
-              {["Board-Certified Aesthetic Specialist", "Advanced InMode Protocol Training", "10+ Years Clinical Experience", "Miami Boutique Studio Founder"].map((credential) => (
-                <p
-                  key={credential}
-                  className="rounded-xl border border-[#B8704C]/20 bg-[#EFE3D5]/55 px-4 py-3 font-sans text-[10px] uppercase tracking-[0.2em] text-[#3A2820]/85"
-                >
-                  {credential}
-                </p>
-              ))}
+        <ScrollReveal
+          as="div"
+          className={`mx-auto grid w-full max-w-6xl items-center gap-10 rounded-[30px] border ${BORDER_CHAMPAGNE} bg-[#FAF7F2]/60 p-6 md:p-10 lg:grid-cols-2`}
+        >
+          <ScrollRevealItem
+            order={4}
+            className="relative mx-auto aspect-[4/5] w-full max-w-[430px] overflow-hidden rounded-[22px] border border-[#B8704C]/20 lg:order-none"
+          >
+            <div className="relative h-full w-full">
+              <Image
+                src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&q=80"
+                alt="Dana, founder of Infinity Beauty Lab"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 40vw"
+              />
             </div>
+          </ScrollRevealItem>
+          <div className="min-w-0">
+            <ScrollRevealItem order={0}>
+              <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
+                Meet Dana
+              </p>
+            </ScrollRevealItem>
+            <ScrollRevealItem order={1}>
+              <h2 className="font-serif text-4xl leading-[1.08] text-[#3A2820] md:text-5xl">
+                Founder-Led Care With Clinical Precision
+              </h2>
+            </ScrollRevealItem>
+            <ScrollRevealItem order={2}>
+              <p className="mt-6 font-sans text-base leading-relaxed text-[#3A2820]/80">
+                Dana combines evidence-based aesthetic medicine with a boutique, high-touch approach designed for
+                natural-looking outcomes. Every treatment plan is created for your skin, your schedule, and your long
+                term goals.
+              </p>
+            </ScrollRevealItem>
+            <ScrollRevealItem order={3}>
+              <div className="mt-7 grid gap-3 sm:grid-cols-2">
+                {["Board-Certified Aesthetic Specialist", "Advanced InMode Protocol Training", "10+ Years Clinical Experience", "Miami Boutique Studio Founder"].map((credential) => (
+                  <p
+                    key={credential}
+                    className={`rounded-xl border ${BORDER_CHAMPAGNE} bg-[#EFE3D5]/45 px-4 py-3 font-sans text-[10px] uppercase tracking-[0.2em] text-[#3A2820]/85`}
+                  >
+                    {credential}
+                  </p>
+                ))}
+              </div>
+            </ScrollRevealItem>
           </div>
-        </div>
+        </ScrollReveal>
       </section>
 
-      <section className="bg-[#FAF7F2] px-6 py-20 md:px-14 lg:px-20" id="treatments-deep-dive">
+      <section className="px-6 py-20 md:px-14 lg:px-20" id="treatments-deep-dive">
         <div className="mx-auto w-full max-w-6xl">
-          <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
-            Treatments Deep Dive
-          </p>
-          <h2 className="mb-10 font-serif text-4xl leading-[1.06] text-[#3A2820] md:mb-12 md:text-5xl">
-            Advanced Protocols, Personalized for You
-          </h2>
+          <ScrollReveal as="div">
+            <ScrollRevealItem order={0}>
+              <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
+                Treatments Deep Dive
+              </p>
+            </ScrollRevealItem>
+            <ScrollRevealItem order={1}>
+              <h2 className="mb-10 font-serif text-4xl leading-[1.06] text-[#3A2820] md:mb-12 md:text-5xl">
+                Advanced Protocols, Personalized for You
+              </h2>
+            </ScrollRevealItem>
+          </ScrollReveal>
 
           <div className="divide-y divide-[#B8704C]/18 border-y border-[#B8704C]/18">
             {treatmentDetails.map((treatment, index) => {
               const imageFirst = index % 2 === 0
               return (
-                <article
+                <ScrollReveal
+                  as="article"
                   key={treatment.name}
                   className="grid items-center gap-8 py-10 md:gap-10 md:py-12 lg:grid-cols-2 lg:gap-12"
                 >
-                  <div
-                    className={`relative aspect-[5/4] overflow-hidden rounded-[24px] border border-[#B8704C]/20 shadow-sm shadow-[#3A2820]/8 ${
+                  <ScrollRevealItem
+                    order={4}
+                    className={`relative aspect-[5/4] overflow-hidden rounded-[24px] border border-[#B8704C]/20 ${SHADOW_TIER2} ${
                       imageFirst ? "lg:order-1" : "lg:order-2"
                     }`}
                   >
-                    <Image
-                      src={treatment.image}
-                      alt={treatment.name}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 1024px) 100vw, 50vw"
-                    />
-                  </div>
+                    <div className="relative h-full w-full">
+                      <Image
+                        src={treatment.image}
+                        alt={treatment.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 1024px) 100vw, 50vw"
+                      />
+                    </div>
+                  </ScrollRevealItem>
 
-                  <div className={imageFirst ? "lg:order-2" : "lg:order-1"}>
-                    <h3 className="font-serif text-4xl leading-tight text-[#3A2820] md:text-[2.6rem]">
-                      {treatment.name}
-                    </h3>
-                    <p className="mt-5 max-w-[52ch] font-sans text-sm leading-relaxed text-[#3A2820]/80 md:text-base">
-                      {treatment.description}
-                    </p>
-                    <dl className="mt-7 grid gap-3 sm:grid-cols-2">
-                      <div className="rounded-xl border border-[#B8704C]/20 bg-[#EFE3D5]/45 px-4 py-3">
-                        <dt className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#3A2820]/65 md:text-[11px]">
-                          Sessions Needed
-                        </dt>
-                        <dd className="mt-1 font-serif text-2xl text-[#3A2820]">{treatment.sessions}</dd>
-                      </div>
-                      <div className="rounded-xl border border-[#B8704C]/20 bg-[#EFE3D5]/45 px-4 py-3">
-                        <dt className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#3A2820]/65 md:text-[11px]">
-                          Downtime
-                        </dt>
-                        <dd className="mt-1 font-serif text-2xl text-[#3A2820]">{treatment.downtime}</dd>
-                      </div>
-                      <div className="rounded-xl border border-[#B8704C]/20 bg-[#EFE3D5]/45 px-4 py-3">
-                        <dt className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#3A2820]/65 md:text-[11px]">
-                          Results Timeline
-                        </dt>
-                        <dd className="mt-1 font-serif text-2xl text-[#3A2820]">{treatment.timeline}</dd>
-                      </div>
-                      <div className="rounded-xl border border-[#B8704C]/20 bg-[#EFE3D5]/45 px-4 py-3">
-                        <dt className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#3A2820]/65 md:text-[11px]">
-                          Best For
-                        </dt>
-                        <dd className="mt-1 font-serif text-2xl text-[#3A2820]">{treatment.bestFor}</dd>
-                      </div>
-                    </dl>
-                    <a
-                      href="#book"
-                      className="mt-7 inline-block font-sans text-[10px] uppercase tracking-[0.28em] text-[#B8704C] md:text-[11px]"
-                    >
-                      Reserve this treatment
-                    </a>
+                  <div className={imageFirst ? "min-w-0 lg:order-2" : "min-w-0 lg:order-1"}>
+                    <ScrollRevealItem order={0}>
+                      <h3 className="font-serif text-4xl leading-tight text-[#3A2820] md:text-[2.6rem]">
+                        {treatment.name}
+                      </h3>
+                    </ScrollRevealItem>
+                    <ScrollRevealItem order={1}>
+                      <p className="mt-5 max-w-[52ch] font-sans text-sm leading-relaxed text-[#3A2820]/80 md:text-base">
+                        {treatment.description}
+                      </p>
+                    </ScrollRevealItem>
+                    <ScrollRevealItem order={2}>
+                      <dl className="mt-7 grid gap-3 sm:grid-cols-2">
+                        <div className="rounded-xl border border-[#B8704C]/20 bg-[#EFE3D5]/45 px-4 py-3">
+                          <dt className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#3A2820]/65 md:text-[11px]">
+                            Sessions Needed
+                          </dt>
+                          <dd className="mt-1 font-serif text-2xl text-[#3A2820]">{treatment.sessions}</dd>
+                        </div>
+                        <div className="rounded-xl border border-[#B8704C]/20 bg-[#EFE3D5]/45 px-4 py-3">
+                          <dt className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#3A2820]/65 md:text-[11px]">
+                            Downtime
+                          </dt>
+                          <dd className="mt-1 font-serif text-2xl text-[#3A2820]">{treatment.downtime}</dd>
+                        </div>
+                        <div className="rounded-xl border border-[#B8704C]/20 bg-[#EFE3D5]/45 px-4 py-3">
+                          <dt className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#3A2820]/65 md:text-[11px]">
+                            Results Timeline
+                          </dt>
+                          <dd className="mt-1 font-serif text-2xl text-[#3A2820]">{treatment.timeline}</dd>
+                        </div>
+                        <div className="rounded-xl border border-[#B8704C]/20 bg-[#EFE3D5]/45 px-4 py-3">
+                          <dt className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#3A2820]/65 md:text-[11px]">
+                            Best For
+                          </dt>
+                          <dd className="mt-1 font-serif text-2xl text-[#3A2820]">{treatment.bestFor}</dd>
+                        </div>
+                      </dl>
+                    </ScrollRevealItem>
+                    <ScrollRevealItem order={3}>
+                      <button
+                        type="button"
+                        onClick={openBookingModal}
+                        className="mt-7 inline-block font-sans text-[10px] uppercase tracking-[0.28em] text-[#B8704C] md:text-[11px]"
+                      >
+                        Reserve this treatment
+                      </button>
+                    </ScrollRevealItem>
                   </div>
-                </article>
+                </ScrollReveal>
               )
             })}
           </div>
@@ -886,7 +1055,7 @@ export default function Page() {
             </p>
             <button
               type="button"
-              onClick={scrollToBooking}
+              onClick={openBookingModal}
               className="mt-7 inline-flex items-center font-sans text-[10px] uppercase tracking-[0.28em] text-[#B8704C] md:text-[11px]"
             >
               Become a member →
@@ -1006,10 +1175,10 @@ export default function Page() {
                   <div className="mt-7 flex flex-col gap-4 sm:flex-row sm:items-center">
                     <button
                       type="button"
-                      onClick={scrollToBooking}
+                      onClick={openBookingModal}
                       className="inline-flex items-center justify-center border border-[#D4956F]/40 bg-[#B8704C] px-6 py-3 font-sans text-[10px] uppercase tracking-[0.25em] text-[#FAF7F2] transition-colors hover:bg-[#B8704C]/85 md:text-[11px]"
                     >
-                      Reserve your consultation with Dana
+                      Book this match
                     </button>
                     <button
                       type="button"
@@ -1384,7 +1553,7 @@ export default function Page() {
             </p>
             <button
               type="button"
-              onClick={scrollToBooking}
+              onClick={openBookingModal}
               className="mt-9 inline-flex items-center justify-center border border-[#D4956F]/40 bg-[#B8704C] px-9 py-4 font-sans text-[10px] uppercase tracking-[0.28em] text-[#FAF7F2] transition-colors hover:bg-[#B8704C]/85 md:text-[11px]"
             >
               Reserve your consultation
@@ -1411,12 +1580,13 @@ export default function Page() {
               Reserve a consultation and receive a tailored treatment roadmap based on your goals, skin condition,
               and lifestyle.
             </p>
-            <a
-              href="#"
+            <button
+              type="button"
+              onClick={openBookingModal}
               className="mt-8 inline-block border border-[#D4956F]/40 bg-[#B8704C] px-8 py-4 font-sans text-[10px] uppercase tracking-[0.28em] text-[#FAF7F2] transition-colors hover:bg-[#B8704C]/85 md:text-[11px]"
             >
               Reserve Your Consultation
-            </a>
+            </button>
           </div>
 
           <div className="space-y-6 rounded-[24px] border border-[#D4956F]/30 bg-[#FAF7F2]/5 p-6 md:p-7">
@@ -1448,6 +1618,276 @@ export default function Page() {
           </p>
         </footer>
       </section>
+
+      <div
+        className={`fixed inset-0 z-[70] bg-[#3A2820]/60 transition-opacity duration-[220ms] ease-out ${
+          bookingModalOpen ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+        aria-hidden={!bookingModalOpen}
+        onClick={closeBookingModal}
+      >
+        <div className="flex h-full items-center justify-center p-6">
+          <div
+            className={`relative my-auto flex max-h-[88vh] w-[92%] flex-col overflow-hidden rounded-[16px] bg-[#FAF7F2] p-6 transition-all duration-[220ms] ease-out md:w-full md:max-w-[520px] md:p-8 ${
+              bookingModalOpen ? "scale-100 opacity-100" : "scale-[0.96] opacity-0"
+            }`}
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Reserve your consultation"
+          >
+            <div className="mb-5 flex items-center justify-center">
+              <div className="flex items-center gap-3">
+                {[0, 1, 2].map((dotIndex) => {
+                  const isActive = bookingStep === dotIndex && !bookingSubmitted
+                  const isCompleted = bookingStep > dotIndex && !bookingSubmitted
+                  return (
+                    <span
+                      key={dotIndex}
+                      className={`h-2.5 w-2.5 rounded-full transition-colors duration-300 ${
+                        isActive || isCompleted ? "bg-[#B8704C]" : "bg-[#D7BFA7]"
+                      }`}
+                    />
+                  )
+                })}
+              </div>
+              <button
+                type="button"
+                onClick={closeBookingModal}
+                className="absolute right-4 top-4 inline-flex size-8 items-center justify-center text-[#B8704C]"
+                aria-label="Close booking modal"
+              >
+                <span className="text-lg leading-none">×</span>
+              </button>
+            </div>
+
+            {!bookingSubmitted ? (
+              <div
+                className={`overflow-y-auto transition-all duration-300 ease-out ${
+                  bookingPanelVisible
+                    ? "translate-x-0 opacity-100"
+                    : bookingTransitionDirection === 1
+                      ? "-translate-x-4 opacity-0"
+                      : "translate-x-4 opacity-0"
+                }`}
+              >
+                {bookingStep === 0 ? (
+                  <div>
+                    <h3 className="font-serif text-3xl text-[#3A2820] md:text-[2.2rem]">Reserve your consultation</h3>
+                    <p className="mt-3 font-sans text-sm leading-relaxed text-[#3A2820]/70 md:text-base">
+                      Step 1 of 3 - choose your treatment and time
+                    </p>
+
+                    <div className="mt-6 space-y-4">
+                      <select
+                        name="preferredTreatment"
+                        value={bookingFormData.preferredTreatment}
+                        onChange={handleBookingFieldChange}
+                        className="h-[52px] w-full rounded-xl border border-[#D7BFA7] bg-white px-4 font-sans text-sm text-[#3A2820] outline-none transition-colors focus:border-[#B8704C]"
+                      >
+                        <option value="" disabled>
+                          Preferred treatment
+                        </option>
+                        {preferredTreatments.map((treatment) => (
+                          <option key={treatment} value={treatment}>
+                            {treatment}
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        type="date"
+                        name="preferredDate"
+                        value={bookingFormData.preferredDate}
+                        onChange={handleBookingFieldChange}
+                        className="h-[52px] w-full rounded-xl border border-[#D7BFA7] bg-white px-4 font-sans text-sm text-[#3A2820] outline-none transition-colors focus:border-[#B8704C]"
+                      />
+                      <div className="grid grid-cols-3 gap-2">
+                        {preferredTimes.map((timeOption) => {
+                          const isSelected = bookingFormData.preferredTime === timeOption
+                          return (
+                            <button
+                              key={timeOption}
+                              type="button"
+                              onClick={() =>
+                                setBookingFormData((prev) => ({
+                                  ...prev,
+                                  preferredTime: timeOption,
+                                }))
+                              }
+                              className={`h-[48px] rounded-xl border font-sans text-xs tracking-[0.08em] transition-colors md:text-sm ${
+                                isSelected
+                                  ? "border-[#B8704C] bg-[#B8704C] text-[#FAF7F2]"
+                                  : "border-[#D7BFA7] bg-[#FAF7F2] text-[#3A2820]"
+                              }`}
+                            >
+                              {timeOption}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleBookingContinue}
+                      disabled={!isBookingStepOneComplete}
+                      className="mt-6 inline-flex h-[52px] w-full items-center justify-center border border-[#D4956F]/40 bg-[#B8704C] px-6 font-sans text-[10px] uppercase tracking-[0.25em] text-[#FAF7F2] transition-colors enabled:hover:bg-[#B8704C]/85 disabled:cursor-not-allowed disabled:opacity-45 md:text-[11px]"
+                    >
+                      Continue
+                    </button>
+                  </div>
+                ) : null}
+
+                {bookingStep === 1 ? (
+                  <div>
+                    <h3 className="font-serif text-3xl text-[#3A2820] md:text-[2.2rem]">Almost there</h3>
+                    <p className="mt-3 font-sans text-sm leading-relaxed text-[#3A2820]/70 md:text-base">
+                      Step 2 of 3 - how can we reach you
+                    </p>
+
+                    <div className="mt-6 space-y-4">
+                      <input
+                        type="text"
+                        name="fullName"
+                        value={bookingFormData.fullName}
+                        onChange={handleBookingFieldChange}
+                        placeholder="Full name"
+                        className="h-[52px] w-full rounded-xl border border-[#D7BFA7] bg-white px-4 font-sans text-sm text-[#3A2820] outline-none transition-colors focus:border-[#B8704C]"
+                      />
+                      <input
+                        type="email"
+                        name="email"
+                        value={bookingFormData.email}
+                        onChange={handleBookingFieldChange}
+                        placeholder="Email"
+                        className="h-[52px] w-full rounded-xl border border-[#D7BFA7] bg-white px-4 font-sans text-sm text-[#3A2820] outline-none transition-colors focus:border-[#B8704C]"
+                      />
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={bookingFormData.phone}
+                        onChange={handleBookingFieldChange}
+                        placeholder="Phone"
+                        className="h-[52px] w-full rounded-xl border border-[#D7BFA7] bg-white px-4 font-sans text-sm text-[#3A2820] outline-none transition-colors focus:border-[#B8704C]"
+                      />
+                    </div>
+
+                    <div className="mt-6 flex items-center justify-between gap-4">
+                      <button
+                        type="button"
+                        onClick={handleBookingBack}
+                        className="font-sans text-[10px] uppercase tracking-[0.24em] text-[#B8704C] md:text-[11px]"
+                      >
+                        Back
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleBookingContinue}
+                        disabled={!isBookingStepTwoComplete}
+                        className="inline-flex h-[50px] items-center justify-center border border-[#D4956F]/40 bg-[#B8704C] px-6 font-sans text-[10px] uppercase tracking-[0.25em] text-[#FAF7F2] transition-colors enabled:hover:bg-[#B8704C]/85 disabled:cursor-not-allowed disabled:opacity-45 md:text-[11px]"
+                      >
+                        Continue
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
+
+                {bookingStep === 2 ? (
+                  <form onSubmit={handleBookingSubmit}>
+                    <h3 className="font-serif text-3xl text-[#3A2820] md:text-[2.2rem]">Confirm your reservation</h3>
+                    <p className="mt-3 font-sans text-sm leading-relaxed text-[#3A2820]/70 md:text-base">
+                      Step 3 of 3 - review and submit
+                    </p>
+
+                    <div className="mt-6 rounded-2xl border border-[#D7BFA7] bg-[#EFE3D5]/45 p-4">
+                      <p className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#B8704C] md:text-[11px]">
+                        Reservation details
+                      </p>
+                      <dl className="mt-3 space-y-2 font-sans text-sm text-[#3A2820]/85">
+                        <div className="flex justify-between gap-4">
+                          <dt>Treatment:</dt>
+                          <dd className="text-right">{bookingFormData.preferredTreatment}</dd>
+                        </div>
+                        <div className="flex justify-between gap-4">
+                          <dt>Date:</dt>
+                          <dd className="text-right">{bookingFormData.preferredDate}</dd>
+                        </div>
+                        <div className="flex justify-between gap-4">
+                          <dt>Time:</dt>
+                          <dd className="text-right">{bookingFormData.preferredTime}</dd>
+                        </div>
+                        <div className="flex justify-between gap-4">
+                          <dt>Name:</dt>
+                          <dd className="text-right">{bookingFormData.fullName}</dd>
+                        </div>
+                        <div className="flex justify-between gap-4">
+                          <dt>Email:</dt>
+                          <dd className="text-right">{bookingFormData.email}</dd>
+                        </div>
+                        <div className="flex justify-between gap-4">
+                          <dt>Phone:</dt>
+                          <dd className="text-right">{bookingFormData.phone}</dd>
+                        </div>
+                      </dl>
+                    </div>
+
+                    <label className="mt-4 block">
+                      <span className="font-sans text-xs text-[#3A2820]/70">
+                        Anything you&apos;d like Dana to know? (optional)
+                      </span>
+                      <textarea
+                        name="message"
+                        value={bookingFormData.message}
+                        onChange={handleBookingFieldChange}
+                        rows={4}
+                        className="mt-2 w-full rounded-xl border border-[#D7BFA7] bg-white px-4 py-3 font-sans text-sm text-[#3A2820] outline-none transition-colors focus:border-[#B8704C]"
+                      />
+                    </label>
+
+                    <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                      <button
+                        type="button"
+                        onClick={handleBookingBack}
+                        className="self-start font-sans text-[10px] uppercase tracking-[0.24em] text-[#B8704C] md:text-[11px]"
+                      >
+                        Back
+                      </button>
+                      <button
+                        type="submit"
+                        className="inline-flex h-[50px] w-full items-center justify-center border border-[#D4956F]/40 bg-[#B8704C] px-6 font-sans text-[10px] uppercase tracking-[0.25em] text-[#FAF7F2] transition-colors hover:bg-[#B8704C]/85 md:w-auto md:text-[11px]"
+                      >
+                        Reserve consultation
+                      </button>
+                    </div>
+
+                    <p className="mt-3 font-sans text-[11px] leading-relaxed text-[#3A2820]/65">
+                      By submitting, you agree to be contacted by Infinity Beauty Lab regarding your appointment.
+                    </p>
+                  </form>
+                ) : null}
+              </div>
+            ) : (
+              <div className="overflow-y-auto py-2 text-center">
+                <div className="mx-auto grid size-12 place-items-center rounded-full border border-[#B8704C]/40 text-[#B8704C]">
+                  <Check size={20} strokeWidth={2.2} />
+                </div>
+                <h3 className="mt-5 font-serif text-3xl text-[#3A2820] md:text-[2.1rem]">Reservation received</h3>
+                <p className="mt-3 font-sans text-sm leading-relaxed text-[#3A2820]/75 md:text-base">
+                  Dana will personally confirm your appointment within the hour. Watch for a message from (305)
+                  555-0188.
+                </p>
+                <button
+                  type="button"
+                  onClick={closeBookingModal}
+                  className="mt-8 inline-flex h-[50px] items-center justify-center border border-[#D4956F]/40 bg-[#B8704C] px-7 font-sans text-[10px] uppercase tracking-[0.25em] text-[#FAF7F2] transition-colors hover:bg-[#B8704C]/85 md:text-[11px]"
+                >
+                  Close
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </main>
   )
 }
