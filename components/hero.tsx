@@ -9,25 +9,89 @@ const interTapToCall = Inter({ subsets: ["latin"], weight: ["400"] })
 type HeroProps = {
   onOpenBookingModal: () => void
   onOpenAboutDrawer: () => void
+  /** Hide fixed nav menu buttons when a full-screen overlay (e.g. Dana profile) is open */
+  suppressMobileMenu?: boolean
 }
 
-const mobileNavItems = [
-  { label: "Treatments", targetId: "treatments" },
-  { label: "Before & After", targetId: "before-after" },
-  { label: "Meet Dana", targetId: "about" },
-  { label: "Investment", targetId: "investment" },
-  { label: "Membership", targetId: "membership" },
-  { label: "Find your treatment", targetId: "find-your-treatment" },
-  { label: "Inside the studio", targetId: "studio" },
-  { label: "Case studies", targetId: "case-studies" },
-  { label: "In their own words", targetId: "in-their-own-words" },
-  { label: "FAQ", targetId: "faq" },
-  { label: "Book your visit", targetId: "book" },
+type MobileNavItem =
+  | { type: "section"; label: string; targetId: string }
+  | { type: "about"; label: string }
+
+/** #before-after top must be this far above the viewport before the desktop menu shows (clears eyebrow + headline from under the fixed corner). */
+const DESKTOP_BEFORE_AFTER_CLEAR_PX = -120
+
+const mobileNavItems: MobileNavItem[] = [
+  { type: "section", label: "Treatments", targetId: "treatments" },
+  { type: "section", label: "Before & After", targetId: "before-after" },
+  { type: "about", label: "Meet Dana" },
+  { type: "section", label: "Investment", targetId: "investment" },
+  { type: "section", label: "Membership", targetId: "membership" },
+  { type: "section", label: "Find your treatment", targetId: "find-your-treatment" },
+  { type: "section", label: "Inside the studio", targetId: "studio" },
+  { type: "section", label: "Case studies", targetId: "case-studies" },
+  { type: "section", label: "In their own words", targetId: "in-their-own-words" },
+  { type: "section", label: "FAQ", targetId: "faq" },
 ]
 
-export default function Hero({ onOpenBookingModal, onOpenAboutDrawer }: HeroProps) {
+export default function Hero({
+  onOpenBookingModal,
+  onOpenAboutDrawer,
+  suppressMobileMenu = false,
+}: HeroProps) {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
   const [isHamburgerOnDarkSection, setIsHamburgerOnDarkSection] = useState(true)
+  const [desktopMenuPastHero, setDesktopMenuPastHero] = useState(false)
+
+  useEffect(() => {
+    const desktopMq = window.matchMedia("(min-width: 768px)")
+    let rafId: number | null = null
+
+    const heroIntersectsViewport = (heroEl: HTMLElement) => {
+      const rect = heroEl.getBoundingClientRect()
+      return (
+        rect.bottom > 0 &&
+        rect.right > 0 &&
+        rect.left < window.innerWidth &&
+        rect.top < window.innerHeight
+      )
+    }
+
+    const tickDesktopMenuVisibility = () => {
+      if (!desktopMq.matches) {
+        setDesktopMenuPastHero(false)
+        return
+      }
+      const heroEl = document.getElementById("hero")
+      const beforeAfterEl = document.getElementById("before-after")
+      if (!heroEl || !beforeAfterEl) return
+
+      const heroVisible = heroIntersectsViewport(heroEl)
+      const beforeAfterTop = beforeAfterEl.getBoundingClientRect().top
+      const clearedBeforeAfterIntro = beforeAfterTop < DESKTOP_BEFORE_AFTER_CLEAR_PX
+
+      setDesktopMenuPastHero(!heroVisible && clearedBeforeAfterIntro)
+    }
+
+    const scheduleDesktopTick = () => {
+      if (rafId !== null) cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(() => {
+        tickDesktopMenuVisibility()
+        rafId = null
+      })
+    }
+
+    scheduleDesktopTick()
+    window.addEventListener("scroll", scheduleDesktopTick, { passive: true })
+    window.addEventListener("resize", scheduleDesktopTick)
+    desktopMq.addEventListener("change", scheduleDesktopTick)
+
+    return () => {
+      desktopMq.removeEventListener("change", scheduleDesktopTick)
+      window.removeEventListener("scroll", scheduleDesktopTick)
+      window.removeEventListener("resize", scheduleDesktopTick)
+      if (rafId !== null) cancelAnimationFrame(rafId)
+    }
+  }, [])
 
   useEffect(() => {
     if (!mobileDrawerOpen) return
@@ -65,14 +129,7 @@ export default function Hero({ onOpenBookingModal, onOpenAboutDrawer }: HeroProp
     }
 
     const updateHamburgerTone = () => {
-      if (!window.matchMedia("(max-width: 767px)").matches) {
-        setIsHamburgerOnDarkSection(true)
-        return
-      }
-
-      // Probe the top strip away from the fixed hamburger (top-right). The menu
-      // button lives inside #hero in the DOM, so elementFromPoint + closest("section")
-      // always resolved to hero.
+      // Same probe for mobile (fixed hamburger) and desktop (fixed hamburger past hero).
       const probeX = window.innerWidth / 2
       const probeY = 36
       setIsHamburgerOnDarkSection(isPointInDarkSections(probeX, probeY))
@@ -105,6 +162,11 @@ export default function Hero({ onOpenBookingModal, onOpenAboutDrawer }: HeroProp
     setMobileDrawerOpen(false)
   }
 
+  const handleMobileBookClick = () => {
+    setMobileDrawerOpen(false)
+    onOpenBookingModal()
+  }
+
   const desktopNavItems = [
     { label: "Treatments", id: "treatments" },
     { label: "Results", id: "results" },
@@ -121,6 +183,11 @@ export default function Hero({ onOpenBookingModal, onOpenAboutDrawer }: HeroProp
     el.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" })
     window.history.pushState(null, "", `#${id}`)
   }
+
+  const showMobileHamburger =
+    !mobileDrawerOpen && !suppressMobileMenu
+  const showDesktopHamburger =
+    desktopMenuPastHero && !mobileDrawerOpen && !suppressMobileMenu
 
   return (
     <section
@@ -320,9 +387,26 @@ export default function Hero({ onOpenBookingModal, onOpenAboutDrawer }: HeroProp
 
       <button
         type="button"
-        className={`fixed right-4 top-4 z-[90] flex flex-col gap-1.5 p-1 transition-[opacity,color] duration-200 md:hidden ${
+        className={`fixed z-[90] flex flex-col gap-1.5 p-1 transition-[opacity,color] duration-200 md:hidden right-4 top-4 ${
           isHamburgerOnDarkSection ? "text-white" : "text-[#B8704C]"
-        } ${mobileDrawerOpen ? "pointer-events-none opacity-0" : "opacity-100"}`}
+        } ${showMobileHamburger ? "opacity-100" : "pointer-events-none opacity-0"}`}
+        aria-hidden={!showMobileHamburger}
+        tabIndex={showMobileHamburger ? undefined : -1}
+        aria-label="Open navigation menu"
+        aria-expanded={mobileDrawerOpen}
+        onClick={() => setMobileDrawerOpen(true)}
+      >
+        <span className="block h-px w-6 bg-current opacity-90 transition-[background-color] duration-200 ease-out" />
+        <span className="block h-px w-4 bg-current transition-[background-color] duration-200 ease-out" />
+      </button>
+
+      <button
+        type="button"
+        className={`fixed z-[90] hidden flex-col gap-1.5 p-1 transition-[opacity,color] duration-200 md:flex right-4 top-4 ${
+          isHamburgerOnDarkSection ? "text-white" : "text-[#B8704C]"
+        } ${showDesktopHamburger ? "opacity-100" : "pointer-events-none opacity-0"}`}
+        aria-hidden={!showDesktopHamburger}
+        tabIndex={showDesktopHamburger ? undefined : -1}
         aria-label="Open navigation menu"
         aria-expanded={mobileDrawerOpen}
         onClick={() => setMobileDrawerOpen(true)}
@@ -332,20 +416,20 @@ export default function Hero({ onOpenBookingModal, onOpenAboutDrawer }: HeroProp
       </button>
 
       <div
-        className={`fixed inset-0 z-40 bg-[#3A2820]/60 transition-opacity duration-300 ease-out md:hidden ${
+        className={`fixed inset-0 z-40 bg-[#3A2820]/60 transition-opacity duration-300 ease-out ${
           mobileDrawerOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
         aria-hidden={!mobileDrawerOpen}
         onClick={() => setMobileDrawerOpen(false)}
       />
       <aside
-        className={`fixed right-0 top-0 z-50 h-full w-[80vw] max-w-[380px] bg-[#FAF7F2] px-6 py-8 shadow-2xl shadow-[#3A2820]/25 transition-transform duration-300 ease-out md:hidden ${
+        className={`fixed right-0 top-0 z-50 flex h-dvh max-h-dvh w-[80vw] max-w-[380px] flex-col bg-[#FAF7F2] shadow-2xl shadow-[#3A2820]/25 transition-transform duration-300 ease-out md:max-w-[min(480px,46vw)] md:w-[min(480px,46vw)] ${
           mobileDrawerOpen ? "translate-x-0" : "translate-x-full"
         }`}
-        aria-label="Mobile navigation drawer"
+        aria-label="Site navigation"
         aria-hidden={!mobileDrawerOpen}
       >
-        <div className="flex justify-end">
+        <div className="flex shrink-0 justify-end px-6 pt-6">
           <button
             type="button"
             onClick={() => setMobileDrawerOpen(false)}
@@ -355,21 +439,45 @@ export default function Hero({ onOpenBookingModal, onOpenAboutDrawer }: HeroProp
             <span className="text-lg leading-none">×</span>
           </button>
         </div>
-        <nav className="mt-4">
-          <ul className="divide-y divide-[#D7BFA7] border-y border-[#D7BFA7]">
-            {mobileNavItems.map((item) => (
-              <li key={item.targetId}>
-                <button
-                  type="button"
-                  onClick={() => handleMobileNavClick(item.targetId)}
-                  className="flex min-h-[60px] w-full items-center py-3 text-left font-serif text-[1.1rem] text-[#3A2820]"
-                >
-                  {item.label}
-                </button>
-              </li>
-            ))}
+
+        <nav
+          className="mt-4 flex min-h-0 flex-1 flex-col px-6"
+          aria-label="Site sections"
+        >
+          <ul className="min-h-0 flex-1 divide-y divide-[#D7BFA7] overflow-y-auto overscroll-contain border-y border-[#D7BFA7] [-webkit-overflow-scrolling:touch]">
+            {mobileNavItems.map((item) => {
+              const key = item.type === "about" ? "meet-dana" : item.targetId
+              return (
+                <li key={key}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (item.type === "about") {
+                        setMobileDrawerOpen(false)
+                        onOpenAboutDrawer()
+                        return
+                      }
+                      handleMobileNavClick(item.targetId)
+                    }}
+                    className="flex min-h-[52px] w-full items-center py-3 text-left font-serif text-[1.05rem] leading-snug text-[#3A2820] md:text-[1.1rem]"
+                  >
+                    {item.label}
+                  </button>
+                </li>
+              )
+            })}
           </ul>
         </nav>
+
+        <div className="shrink-0 border-t border-[#D7BFA7] bg-[#FAF7F2] px-6 pb-[max(1.25rem,env(safe-area-inset-bottom,0px))] pt-4">
+          <button
+            type="button"
+            onClick={handleMobileBookClick}
+            className="w-full rounded-xl bg-[#3A2820] px-4 py-3.5 font-sans text-[10px] font-medium uppercase tracking-[0.26em] text-[#FAF7F2] transition-colors hover:bg-[#2a1c16] active:bg-[#241811]"
+          >
+            Book your visit
+          </button>
+        </div>
       </aside>
     </section>
   )

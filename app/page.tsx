@@ -669,6 +669,7 @@ export default function Page() {
       <Hero
         onOpenBookingModal={openBookingModal}
         onOpenAboutDrawer={() => setDanaProfileDrawerOpen(true)}
+        suppressMobileMenu={danaProfileDrawerOpen}
       />
 
       <section className="border-y border-[#B8704C]/15 bg-[#EFE3D5] px-6 py-8 md:px-14 lg:px-20">
@@ -1643,11 +1644,11 @@ export default function Page() {
       </section>
 
       <div
-        className={`fixed inset-0 z-[65] flex justify-end ${danaProfileDrawerOpen ? "pointer-events-auto" : "pointer-events-none"}`}
+        className={`fixed inset-0 z-[110] flex justify-end ${danaProfileDrawerOpen ? "pointer-events-auto" : "pointer-events-none"}`}
         aria-hidden={!danaProfileDrawerOpen}
       >
         <div
-          className={`absolute inset-0 bg-[rgba(0,0,0,0.4)] transition-opacity duration-[350ms] ease-out ${
+          className={`absolute inset-0 z-0 bg-[rgba(0,0,0,0.4)] transition-opacity duration-[350ms] ease-out ${
             danaProfileDrawerOpen ? "opacity-100" : "opacity-0"
           } ${danaProfileDrawerOpen ? "" : "pointer-events-none"}`}
           aria-hidden="true"
@@ -1657,14 +1658,14 @@ export default function Page() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="dana-drawer-title"
-          className={`relative z-[66] flex h-full w-[100vw] max-w-[100vw] flex-col bg-[#FAF7F2] shadow-xl transition-transform duration-[350ms] ease-out md:w-[480px] md:max-w-[480px] ${
+          className={`relative z-[1] flex h-full w-[100vw] max-w-[100vw] flex-col bg-[#FAF7F2] shadow-xl transition-transform duration-[350ms] ease-out md:w-[480px] md:max-w-[480px] ${
             danaProfileDrawerOpen ? "translate-x-0" : "translate-x-full pointer-events-none"
           }`}
         >
           <button
             type="button"
             onClick={() => setDanaProfileDrawerOpen(false)}
-            className="absolute right-4 top-4 z-20 inline-flex size-9 items-center justify-center rounded-full bg-[#FAF7F2]/95 text-[#B8704C] shadow-sm transition-colors hover:text-[#3A2820]"
+            className="absolute z-20 inline-flex size-9 items-center justify-center rounded-full bg-[#FAF7F2]/95 text-[#B8704C] shadow-sm transition-colors hover:text-[#3A2820] right-[max(1rem,env(safe-area-inset-right,0px)+0.5rem)] top-[max(1rem,env(safe-area-inset-top,0px)+0.5rem)]"
             aria-label="Close Dana profile"
           >
             <X className="size-4" strokeWidth={1.75} aria-hidden="true" />
