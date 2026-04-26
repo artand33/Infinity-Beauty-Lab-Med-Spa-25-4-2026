@@ -10,7 +10,7 @@ type HeroProps = {
 const mobileNavItems = [
   { label: "Treatments", targetId: "treatments" },
   { label: "Before & After", targetId: "before-after" },
-  { label: "Meet Dana", targetId: "meet-dana" },
+  { label: "Meet Dana", targetId: "about" },
   { label: "Investment", targetId: "investment" },
   { label: "Membership", targetId: "membership" },
   { label: "Find your treatment", targetId: "find-your-treatment" },
@@ -101,6 +101,23 @@ export default function Hero({ onOpenBookingModal }: HeroProps) {
     setMobileDrawerOpen(false)
   }
 
+  const desktopNavItems = [
+    { label: "Treatments", id: "treatments" },
+    { label: "Results", id: "results" },
+    { label: "About", id: "about" },
+    { label: "Membership", id: "membership" },
+    { label: "Contact", id: "book" },
+  ] as const
+
+  const scrollToSectionId = (id: string) => {
+    const el = document.getElementById(id)
+    if (!el) return
+    const reduceMotion =
+      typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    el.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" })
+    window.history.pushState(null, "", `#${id}`)
+  }
+
   return (
     <section
       id="hero"
@@ -143,16 +160,34 @@ export default function Hero({ onOpenBookingModal }: HeroProps) {
           </span>
         </div>
 
-        <nav className="hidden md:flex items-center gap-8">
-          {["Treatments", "About", "Journal", "Contact"].map((item) => (
-            <a
-              key={item}
-              href="#"
-              className="font-sans text-[11px] tracking-[0.3em] uppercase text-white/55 hover:text-white/90 transition-colors duration-300 font-light"
-            >
-              {item}
-            </a>
-          ))}
+        <nav
+          className="hidden md:flex items-center gap-5 lg:gap-7"
+          aria-label="Primary"
+        >
+          <div className="flex flex-wrap items-center justify-end">
+            {desktopNavItems.map((item, index) => (
+              <span key={item.id} className="inline-flex items-center">
+                {index > 0 ? (
+                  <span
+                    className="mx-3 font-sans text-[11px] font-light text-white/25 select-none"
+                    aria-hidden="true"
+                  >
+                    ·
+                  </span>
+                ) : null}
+                <a
+                  href={`#${item.id}`}
+                  onClick={(event) => {
+                    event.preventDefault()
+                    scrollToSectionId(item.id)
+                  }}
+                  className="font-sans text-[11px] tracking-[0.3em] uppercase text-white/55 hover:text-white/90 transition-colors duration-300 font-light"
+                >
+                  {item.label}
+                </a>
+              </span>
+            ))}
+          </div>
         </nav>
 
       </header>

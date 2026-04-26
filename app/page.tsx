@@ -1,13 +1,15 @@
 "use client"
 
-import { type ChangeEvent, type FormEvent, useEffect, useState } from "react"
+import { Fragment, type ChangeEvent, type FormEvent, useEffect, useState } from "react"
 import Image from "next/image"
 import {
   Calendar,
   CalendarCheck2,
   ClipboardList,
+  Facebook,
   Gift,
   Heart,
+  Instagram,
   MapPin,
   Percent,
   Phone,
@@ -33,6 +35,21 @@ import {
 } from "@/components/ui/accordion"
 
 const trustItems = ["InMode", "FDA-Cleared", "Top 10% Provider", "Verified Expert"]
+
+const studioInstagramUrl =
+  process.env.NEXT_PUBLIC_STUDIO_INSTAGRAM_URL ?? "https://www.instagram.com/"
+const studioFacebookUrl =
+  process.env.NEXT_PUBLIC_STUDIO_FACEBOOK_URL ?? "https://www.facebook.com/"
+const studioWhatsAppUrl =
+  process.env.NEXT_PUBLIC_STUDIO_WHATSAPP_URL ?? "https://wa.me/13055550142"
+
+function WhatsappGlyph({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+    </svg>
+  )
+}
 
 type BeforeAfterCategory = "face" | "body" | "skin"
 
@@ -350,9 +367,9 @@ const firstVisitTimeline = [
   },
   {
     number: "03",
-    title: "Skin assessment with Dana",
+    title: "Skin assessment with Dana Vargova",
     description:
-      "Dana reviews your concerns, examines your skin, and walks you through realistic outcomes for your goals.",
+      "Dana Vargova reviews your concerns, examines your skin, and walks you through realistic outcomes for your goals.",
     icon: ScanFace,
   },
   {
@@ -421,8 +438,6 @@ const preferredTreatments = [
   "Membership consultation",
 ]
 
-const preferredTimes = ["Morning", "Afternoon", "Evening"]
-
 export default function Page() {
   const [activeBeforeAfterCategory, setActiveBeforeAfterCategory] =
     useState<BeforeAfterCategory>("face")
@@ -445,6 +460,7 @@ export default function Page() {
   const [cardSplitById, setCardSplitById] = useState<Record<string, number>>(() =>
     Object.fromEntries(beforeAfterPairs.map((p) => [p.id, 50])),
   )
+  const [danaModalOpen, setDanaModalOpen] = useState(false)
   const [bookingModalOpen, setBookingModalOpen] = useState(false)
   const [bookingSubmitted, setBookingSubmitted] = useState(false)
   const [bookingStep, setBookingStep] = useState(0)
@@ -466,11 +482,12 @@ export default function Page() {
   const supportingReviews = reviews.slice(0, 3)
 
   useEffect(() => {
-    if (!bookingModalOpen) return
+    if (!bookingModalOpen && !danaModalOpen) return
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setBookingModalOpen(false)
+        setDanaModalOpen(false)
       }
     }
 
@@ -482,7 +499,7 @@ export default function Page() {
       document.body.style.overflow = originalOverflow
       window.removeEventListener("keydown", handleEscape)
     }
-  }, [bookingModalOpen])
+  }, [bookingModalOpen, danaModalOpen])
 
   const selectBeforeAfterCategory = (next: BeforeAfterCategory) => {
     if (next === activeBeforeAfterCategory) return
@@ -569,6 +586,7 @@ export default function Page() {
   }
 
   const openBookingModal = () => {
+    setDanaModalOpen(false)
     setBookingStep(0)
     setBookingPanelVisible(true)
     setBookingTransitionDirection(1)
@@ -630,10 +648,7 @@ export default function Page() {
     transitionToBookingStep(bookingStep - 1, -1)
   }
 
-  const isBookingStepOneComplete =
-    bookingFormData.preferredTreatment.trim() !== "" &&
-    bookingFormData.preferredDate.trim() !== "" &&
-    bookingFormData.preferredTime.trim() !== ""
+  const isBookingStepOneComplete = bookingFormData.preferredTreatment.trim() !== ""
   const isBookingStepTwoComplete =
     bookingFormData.fullName.trim() !== "" &&
     bookingFormData.email.trim() !== "" &&
@@ -667,10 +682,7 @@ export default function Page() {
         </ScrollReveal>
       </section>
 
-      <section
-        className="px-6 py-20 md:px-14 lg:px-20"
-        id="before-after"
-      >
+      <section className="px-6 py-20 md:px-14 lg:px-20" id="before-after">
         <ScrollReveal as="div" className="mx-auto w-full max-w-6xl">
           <ScrollRevealItem order={0}>
             <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
@@ -678,7 +690,10 @@ export default function Page() {
             </p>
           </ScrollRevealItem>
           <ScrollRevealItem order={1}>
-            <h2 className="mb-8 font-serif text-4xl leading-[1.06] text-[#3A2820] md:mb-10 md:text-5xl">
+            <h2
+              id="results"
+              className="mb-8 font-serif text-4xl leading-[1.06] text-[#3A2820] md:mb-10 md:text-5xl"
+            >
               Real Results, Naturally Refined
             </h2>
           </ScrollRevealItem>
@@ -771,7 +786,7 @@ export default function Page() {
         </ScrollReveal>
       </section>
 
-      <section className="bg-[#EFE3D5]/65 px-6 py-20 md:px-14 lg:px-20" id="treatments">
+      <section className="bg-[#EFE3D5]/65 px-6 py-20 md:px-14 lg:px-20">
         <ScrollReveal as="div" className="mx-auto w-full max-w-6xl">
           <ScrollRevealItem order={0}>
             <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
@@ -805,7 +820,7 @@ export default function Page() {
         </ScrollReveal>
       </section>
 
-      <section className="px-6 py-20 md:px-14 lg:px-20" id="meet-dana">
+      <section className="px-6 py-20 md:px-14 lg:px-20" id="about">
         <ScrollReveal
           as="div"
           className={`mx-auto grid w-full max-w-6xl items-center gap-10 rounded-[30px] border ${BORDER_CHAMPAGNE} bg-[#FAF7F2]/60 p-6 md:p-10 lg:grid-cols-2`}
@@ -817,7 +832,7 @@ export default function Page() {
             <div className="relative h-full w-full">
               <Image
                 src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&q=80"
-                alt="Dana, founder of Infinity Beauty Lab"
+                alt="Dana Vargova, founder of Infinity Beauty Lab"
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 40vw"
@@ -837,14 +852,19 @@ export default function Page() {
             </ScrollRevealItem>
             <ScrollRevealItem order={2}>
               <p className="mt-6 font-sans text-base leading-relaxed text-[#3A2820]/80">
-                Dana combines evidence-based aesthetic medicine with a boutique, high-touch approach designed for
+                Dana Vargova combines evidence-based aesthetic medicine with a boutique, high-touch approach designed for
                 natural-looking outcomes. Every treatment plan is created for your skin, your schedule, and your long
                 term goals.
               </p>
             </ScrollRevealItem>
             <ScrollRevealItem order={3}>
               <div className="mt-7 grid gap-3 sm:grid-cols-2">
-                {["Board-Certified Aesthetic Specialist", "Advanced InMode Protocol Training", "10+ Years Clinical Experience", "Miami Boutique Studio Founder"].map((credential) => (
+                {[
+                  "InMode Verified Expert",
+                  "Top 10% Morpheus8 Provider",
+                  "First in Miami with Optimas Max",
+                  "10+ Years Aesthetic Medicine",
+                ].map((credential) => (
                   <p
                     key={credential}
                     className={`rounded-xl border ${BORDER_CHAMPAGNE} bg-[#EFE3D5]/45 px-4 py-3 font-sans text-[10px] uppercase tracking-[0.2em] text-[#3A2820]/85`}
@@ -854,11 +874,20 @@ export default function Page() {
                 ))}
               </div>
             </ScrollRevealItem>
+            <ScrollRevealItem order={4}>
+              <button
+                type="button"
+                onClick={() => setDanaModalOpen(true)}
+                className="mt-8 inline-block font-sans text-[10px] uppercase tracking-[0.28em] text-[#B8704C] transition-colors hover:text-[#3A2820] md:text-[11px]"
+              >
+                View extended profile
+              </button>
+            </ScrollRevealItem>
           </div>
         </ScrollReveal>
       </section>
 
-      <section className="px-6 py-20 md:px-14 lg:px-20" id="treatments-deep-dive">
+      <section className="px-6 py-20 md:px-14 lg:px-20" id="treatments">
         <div className="mx-auto w-full max-w-6xl">
           <ScrollReveal as="div">
             <ScrollRevealItem order={0}>
@@ -1519,6 +1548,49 @@ export default function Page() {
                 Saturday 10:00AM-3:00PM
               </p>
             </div>
+            <div>
+              <p className="font-sans text-[10px] uppercase tracking-[0.25em] text-[#D4956F] md:text-[11px]">Phone</p>
+              <p className="mt-2 font-sans text-sm leading-relaxed text-[#FAF7F2]/80">
+                <a
+                  href="tel:+13055550142"
+                  className="text-[#FAF7F2]/90 transition-colors hover:text-[#E9D2BE]"
+                >
+                  (305) 555-0142
+                </a>
+              </p>
+            </div>
+            <div>
+              <p className="font-sans text-[10px] uppercase tracking-[0.25em] text-[#D4956F] md:text-[11px]">Follow</p>
+              <div className="mt-3 flex items-center gap-5">
+                <a
+                  href={studioInstagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#FAF7F2]/65 transition-colors hover:text-[#E9D2BE]"
+                  aria-label="Infinity Beauty Lab on Instagram"
+                >
+                  <Instagram className="size-[18px]" strokeWidth={1.35} aria-hidden="true" />
+                </a>
+                <a
+                  href={studioFacebookUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#FAF7F2]/65 transition-colors hover:text-[#E9D2BE]"
+                  aria-label="Infinity Beauty Lab on Facebook"
+                >
+                  <Facebook className="size-[18px]" strokeWidth={1.35} aria-hidden="true" />
+                </a>
+                <a
+                  href={studioWhatsAppUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#FAF7F2]/65 transition-colors hover:text-[#E9D2BE]"
+                  aria-label="Message Infinity Beauty Lab on WhatsApp"
+                >
+                  <WhatsappGlyph className="size-[18px]" />
+                </a>
+              </div>
+            </div>
             <div className="relative w-full min-h-[200px] overflow-hidden rounded-[12px] border border-[#D4956F]/30 aspect-[4/3]">
               <iframe
                 title="Infinity Beauty Lab — 1221 Brickell Ave, Miami on Google Maps"
@@ -1543,6 +1615,97 @@ export default function Page() {
       </section>
 
       <div
+        className={`fixed inset-0 z-[65] bg-[#3A2820]/60 transition-opacity duration-[220ms] ease-out ${
+          danaModalOpen ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+        aria-hidden={!danaModalOpen}
+        onClick={() => setDanaModalOpen(false)}
+      >
+        <div className="relative z-[66] flex h-full items-center justify-center p-6">
+          <div
+            className={`relative my-auto flex max-h-[min(88vh,820px)] w-[92%] max-w-2xl flex-col overflow-hidden rounded-[16px] border border-[#D7BFA7] bg-[#FAF7F2] ${SHADOW_TIER1} transition-all duration-[220ms] ease-out md:w-full ${
+              danaModalOpen ? "scale-100 opacity-100" : "scale-[0.96] opacity-0"
+            }`}
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="dana-modal-title"
+          >
+            <button
+              type="button"
+              onClick={() => setDanaModalOpen(false)}
+              className="absolute right-4 top-4 z-[1] inline-flex size-8 items-center justify-center text-[#B8704C]"
+              aria-label="Close Dana profile"
+            >
+              <span className="text-lg leading-none">×</span>
+            </button>
+            <div className="max-h-[min(88vh,820px)] overflow-y-auto overscroll-contain px-6 pb-10 pt-12 md:px-10 md:pb-12 md:pt-14">
+              <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
+                Meet Dana
+              </p>
+              <h2
+                id="dana-modal-title"
+                className="font-serif text-3xl leading-[1.08] text-[#3A2820] md:text-4xl md:leading-tight"
+              >
+                Founder-Led Care With Clinical Precision
+              </h2>
+              <p className="mt-6 font-sans text-sm leading-relaxed text-[#3A2820]/80 md:text-base">
+                Dana Vargova combines evidence-based aesthetic medicine with a boutique, high-touch approach designed for
+                natural-looking outcomes. Every treatment plan is created for your skin, your schedule, and your long
+                term goals.
+              </p>
+              <p className="mt-6 font-sans text-sm leading-relaxed text-[#3A2820]/80 md:text-base">
+                Her practice is built on conservative dosing, honest timelines, and protocols that respect your
+                anatomy—so results read as refreshed, never overdone. She continues advanced training with InMode and
+                related platforms to keep technique current as devices evolve.
+              </p>
+              <p className="mt-5 font-sans text-[10px] uppercase tracking-[0.32em] text-[#B8704C] md:text-[11px]">
+                Selected milestones
+              </p>
+              <ul className="mt-4 list-inside list-disc space-y-2 font-sans text-sm leading-relaxed text-[#3A2820]/80 md:text-base">
+                <li>InMode Verified Expert; recognized for consistent, complication-aware Morpheus8 outcomes.</li>
+                <li>Top 10% Morpheus8 provider benchmark; complex skin types and combination protocols.</li>
+                <li>First in Miami with Optimas Max; early adoption where it meaningfully improves patient results.</li>
+                <li>Ongoing advanced training across energy-based and light-based modalities.</li>
+              </ul>
+              <p className="mt-10 font-sans text-[10px] uppercase tracking-[0.32em] text-[#B8704C] md:text-[11px]">
+                In the studio
+              </p>
+              <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                <div className="relative aspect-[4/5] overflow-hidden rounded-[14px] border border-[#B8704C]/20">
+                  <Image
+                    src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&q=80"
+                    alt="Dana Vargova, founder of Infinity Beauty Lab"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 360px"
+                  />
+                </div>
+                <div className="relative aspect-[4/5] overflow-hidden rounded-[14px] border border-[#B8704C]/20">
+                  <Image
+                    src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&q=80"
+                    alt="Consultation at Infinity Beauty Lab"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 360px"
+                  />
+                </div>
+                <div className="relative aspect-[5/4] overflow-hidden rounded-[14px] border border-[#B8704C]/20 sm:col-span-2">
+                  <Image
+                    src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200&q=80"
+                    alt="Treatment room detail at Infinity Beauty Lab"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 720px"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
         className={`fixed inset-0 z-[70] bg-[#3A2820]/60 transition-opacity duration-[220ms] ease-out ${
           bookingModalOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
@@ -1551,7 +1714,7 @@ export default function Page() {
       >
         <div className="relative z-[80] flex h-full items-center justify-center p-6">
           <div
-            className={`relative my-auto flex max-h-[88vh] w-[92%] flex-col overflow-hidden rounded-[16px] bg-[#FAF7F2] p-6 ${SHADOW_TIER1} transition-all duration-[220ms] ease-out md:w-full md:max-w-[520px] md:p-8 ${
+            className={`relative my-auto flex max-h-[min(92vh,920px)] w-[94%] flex-col overflow-hidden rounded-[18px] bg-[#FAF7F2] p-6 ${SHADOW_TIER1} transition-all duration-[220ms] ease-out md:w-full md:max-w-[min(92vw,760px)] md:p-10 lg:max-w-[820px] ${
               bookingModalOpen ? "scale-100 opacity-100" : "scale-[0.96] opacity-0"
             }`}
             onClick={(event) => event.stopPropagation()}
@@ -1559,7 +1722,7 @@ export default function Page() {
             aria-modal="true"
             aria-label="Reserve your consultation"
           >
-            <div className="mb-5 flex items-center justify-center">
+            <div className="mb-5 flex shrink-0 items-center justify-center">
               <div className="flex items-center gap-3">
                 {[0, 1, 2].map((dotIndex) => {
                   const isActive = bookingStep === dotIndex && !bookingSubmitted
@@ -1585,81 +1748,66 @@ export default function Page() {
             </div>
 
             {!bookingSubmitted ? (
-              <div
-                className={`overflow-y-auto transition-all duration-300 ease-out ${
-                  bookingPanelVisible
-                    ? "translate-x-0 opacity-100"
-                    : bookingTransitionDirection === 1
-                      ? "-translate-x-4 opacity-0"
-                      : "translate-x-4 opacity-0"
-                }`}
-              >
-                {bookingStep === 0 ? (
-                  <div>
-                    <h3 className="font-serif text-3xl text-[#3A2820] md:text-[2.2rem]">Reserve your consultation</h3>
-                    <p className="mt-3 font-sans text-sm leading-relaxed text-[#3A2820]/70 md:text-base">
-                      Step 1 of 3 - choose your treatment and time
-                    </p>
+              <Fragment>
+                <div
+                  className={`min-h-0 flex-1 overflow-y-auto overscroll-contain transition-all duration-300 ease-out ${
+                    bookingPanelVisible
+                      ? "translate-x-0 opacity-100"
+                      : bookingTransitionDirection === 1
+                        ? "-translate-x-4 opacity-0"
+                        : "translate-x-4 opacity-0"
+                  }`}
+                >
+                  {bookingStep === 0 ? (
+                    <div>
+                      <h3 className="font-serif text-3xl text-[#3A2820] md:text-[2.35rem]">
+                        Reserve your consultation
+                      </h3>
+                      <p className="mt-3 font-sans text-sm leading-relaxed text-[#3A2820]/70 md:text-base">
+                        Step 1 of 3 — choose the treatment you have in mind. We&apos;ll confirm scheduling after we
+                        reach you.
+                      </p>
 
-                    <div className="mt-6 space-y-4">
-                      <select
-                        name="preferredTreatment"
-                        value={bookingFormData.preferredTreatment}
-                        onChange={handleBookingFieldChange}
-                        className="h-[52px] w-full rounded-xl border border-[#D7BFA7] bg-white px-4 font-sans text-sm text-[#3A2820] outline-none transition-colors focus:border-[#B8704C]"
-                      >
-                        <option value="" disabled>
-                          Preferred treatment
-                        </option>
-                        {preferredTreatments.map((treatment) => (
-                          <option key={treatment} value={treatment}>
-                            {treatment}
-                          </option>
-                        ))}
-                      </select>
-                      <input
-                        type="date"
-                        name="preferredDate"
-                        value={bookingFormData.preferredDate}
-                        onChange={handleBookingFieldChange}
-                        className="h-[52px] w-full rounded-xl border border-[#D7BFA7] bg-white px-4 font-sans text-sm text-[#3A2820] outline-none transition-colors focus:border-[#B8704C]"
-                      />
-                      <div className="grid grid-cols-3 gap-2">
-                        {preferredTimes.map((timeOption) => {
-                          const isSelected = bookingFormData.preferredTime === timeOption
-                          return (
-                            <button
-                              key={timeOption}
-                              type="button"
-                              onClick={() =>
-                                setBookingFormData((prev) => ({
-                                  ...prev,
-                                  preferredTime: timeOption,
-                                }))
-                              }
-                              className={`h-[48px] rounded-xl border font-sans text-xs tracking-[0.08em] transition-colors md:text-sm ${
-                                isSelected
-                                  ? "border-[#B8704C] bg-[#B8704C] text-[#FAF7F2]"
-                                  : "border-[#D7BFA7] bg-[#FAF7F2] text-[#3A2820]"
-                              }`}
-                            >
-                              {timeOption}
-                            </button>
-                          )
-                        })}
+                      <div className="mt-8" role="group" aria-label="Preferred treatment">
+                        <p className="font-sans text-[10px] uppercase tracking-[0.28em] text-[#B8704C] md:text-[11px]">
+                          Treatment
+                        </p>
+                        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                          {preferredTreatments.map((treatment) => {
+                            const isSelected = bookingFormData.preferredTreatment === treatment
+                            return (
+                              <button
+                                key={treatment}
+                                type="button"
+                                onClick={() =>
+                                  setBookingFormData((prev) => ({
+                                    ...prev,
+                                    preferredTreatment: treatment,
+                                  }))
+                                }
+                                className={`min-h-[56px] rounded-xl border px-4 py-3 text-left font-sans text-sm leading-snug transition-colors md:min-h-[60px] md:text-[15px] md:leading-snug ${
+                                  isSelected
+                                    ? "border-[#B8704C] bg-[#B8704C] text-[#FAF7F2]"
+                                    : "border-[#D7BFA7] bg-white text-[#3A2820] hover:border-[#B8704C]/55"
+                                }`}
+                              >
+                                {treatment}
+                              </button>
+                            )
+                          })}
+                        </div>
                       </div>
-                    </div>
 
-                    <button
-                      type="button"
-                      onClick={handleBookingContinue}
-                      disabled={!isBookingStepOneComplete}
-                      className="mt-6 inline-flex h-[52px] w-full items-center justify-center border border-[#D4956F]/40 bg-[#B8704C] px-6 font-sans text-[10px] uppercase tracking-[0.25em] text-[#FAF7F2] transition-colors enabled:hover:bg-[#B8704C]/85 disabled:cursor-not-allowed disabled:opacity-45 md:text-[11px]"
-                    >
-                      Continue
-                    </button>
-                  </div>
-                ) : null}
+                      <button
+                        type="button"
+                        onClick={handleBookingContinue}
+                        disabled={!isBookingStepOneComplete}
+                        className="mt-8 inline-flex min-h-[56px] w-full items-center justify-center border border-[#D4956F]/40 bg-[#B8704C] px-6 font-sans text-[10px] uppercase tracking-[0.25em] text-[#FAF7F2] transition-colors enabled:hover:bg-[#B8704C]/85 disabled:cursor-not-allowed disabled:opacity-45 md:mt-10 md:text-[11px]"
+                      >
+                        Continue
+                      </button>
+                    </div>
+                  ) : null}
 
                 {bookingStep === 1 ? (
                   <div>
@@ -1732,14 +1880,6 @@ export default function Page() {
                           <dd className="text-right">{bookingFormData.preferredTreatment}</dd>
                         </div>
                         <div className="flex justify-between gap-4">
-                          <dt>Date:</dt>
-                          <dd className="text-right">{bookingFormData.preferredDate}</dd>
-                        </div>
-                        <div className="flex justify-between gap-4">
-                          <dt>Time:</dt>
-                          <dd className="text-right">{bookingFormData.preferredTime}</dd>
-                        </div>
-                        <div className="flex justify-between gap-4">
                           <dt>Name:</dt>
                           <dd className="text-right">{bookingFormData.fullName}</dd>
                         </div>
@@ -1788,7 +1928,37 @@ export default function Page() {
                     </p>
                   </form>
                 ) : null}
-              </div>
+                </div>
+                <div className="flex shrink-0 items-center justify-center gap-5 border-t border-[#D7BFA7]/40 pt-4 pb-1">
+                  <a
+                    href={studioInstagramUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#3A2820]/50 transition-colors hover:text-[#B8704C]"
+                    aria-label="Infinity Beauty Lab on Instagram"
+                  >
+                    <Instagram className="size-[18px]" strokeWidth={1.35} aria-hidden="true" />
+                  </a>
+                  <a
+                    href={studioFacebookUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#3A2820]/50 transition-colors hover:text-[#B8704C]"
+                    aria-label="Infinity Beauty Lab on Facebook"
+                  >
+                    <Facebook className="size-[18px]" strokeWidth={1.35} aria-hidden="true" />
+                  </a>
+                  <a
+                    href={studioWhatsAppUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#3A2820]/50 transition-colors hover:text-[#B8704C]"
+                    aria-label="Message Infinity Beauty Lab on WhatsApp"
+                  >
+                    <WhatsappGlyph className="size-[18px]" />
+                  </a>
+                </div>
+              </Fragment>
             ) : (
               <div className="overflow-y-auto py-2 text-center">
                 <div className="mx-auto grid size-12 place-items-center rounded-full border border-[#B8704C]/40 text-[#B8704C]">
