@@ -16,6 +16,7 @@ import {
   ScanFace,
   Sparkles,
   Check,
+  X,
 } from "lucide-react"
 
 import { Inter } from "next/font/google"
@@ -462,7 +463,7 @@ export default function Page() {
   const [cardSplitById, setCardSplitById] = useState<Record<string, number>>(() =>
     Object.fromEntries(beforeAfterPairs.map((p) => [p.id, 50])),
   )
-  const [danaModalOpen, setDanaModalOpen] = useState(false)
+  const [danaProfileDrawerOpen, setDanaProfileDrawerOpen] = useState(false)
   const [bookingModalOpen, setBookingModalOpen] = useState(false)
   const [bookingSubmitted, setBookingSubmitted] = useState(false)
   const [bookingStep, setBookingStep] = useState(0)
@@ -484,12 +485,12 @@ export default function Page() {
   const supportingReviews = reviews.slice(0, 3)
 
   useEffect(() => {
-    if (!bookingModalOpen && !danaModalOpen) return
+    if (!bookingModalOpen && !danaProfileDrawerOpen) return
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setBookingModalOpen(false)
-        setDanaModalOpen(false)
+        setDanaProfileDrawerOpen(false)
       }
     }
 
@@ -501,7 +502,7 @@ export default function Page() {
       document.body.style.overflow = originalOverflow
       window.removeEventListener("keydown", handleEscape)
     }
-  }, [bookingModalOpen, danaModalOpen])
+  }, [bookingModalOpen, danaProfileDrawerOpen])
 
   const selectBeforeAfterCategory = (next: BeforeAfterCategory) => {
     if (next === activeBeforeAfterCategory) return
@@ -588,7 +589,7 @@ export default function Page() {
   }
 
   const openBookingModal = () => {
-    setDanaModalOpen(false)
+    setDanaProfileDrawerOpen(false)
     setBookingStep(0)
     setBookingPanelVisible(true)
     setBookingTransitionDirection(1)
@@ -665,7 +666,10 @@ export default function Page() {
 
   return (
     <main className="relative z-[2] bg-transparent text-[#3A2820]">
-      <Hero onOpenBookingModal={openBookingModal} />
+      <Hero
+        onOpenBookingModal={openBookingModal}
+        onOpenAboutDrawer={() => setDanaProfileDrawerOpen(true)}
+      />
 
       <section className="border-y border-[#B8704C]/15 bg-[#EFE3D5] px-6 py-8 md:px-14 lg:px-20">
         <ScrollReveal as="div" className="mx-auto w-full max-w-6xl">
@@ -833,7 +837,7 @@ export default function Page() {
           >
             <div className="relative h-full w-full">
               <Image
-                src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&q=80"
+                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&q=80"
                 alt="Dana Vargova, founder of Infinity Beauty Lab"
                 fill
                 className="object-cover"
@@ -879,7 +883,7 @@ export default function Page() {
             <ScrollRevealItem order={4}>
               <button
                 type="button"
-                onClick={() => setDanaModalOpen(true)}
+                onClick={() => setDanaProfileDrawerOpen(true)}
                 className="mt-8 inline-block font-sans text-[10px] uppercase tracking-[0.28em] text-[#B8704C] transition-colors hover:text-[#3A2820] md:text-[11px]"
               >
                 View extended profile
@@ -1332,9 +1336,19 @@ export default function Page() {
                         sizes="(max-width: 768px) 100vw, 33vw"
                       />
                       <div className="absolute inset-0 bg-[#3A2820]/30" />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="grid size-14 place-items-center rounded-full border border-[#FAF7F2]/50 bg-[#FAF7F2]/10 text-[#FAF7F2]">
+                      <div
+                        className="pointer-events-none absolute bottom-0 left-0 right-0 h-[45%] bg-gradient-to-b from-transparent to-[rgba(0,0,0,0.45)]"
+                        aria-hidden
+                      />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2.5">
+                        <span
+                          className="grid size-14 place-items-center rounded-full border border-white/35 bg-white/95 text-[#3A2820] shadow-[0_4px_20px_rgba(0,0,0,0.22)]"
+                          aria-hidden
+                        >
                           ▶
+                        </span>
+                        <span className="text-center font-sans text-[10px] font-medium tracking-[0.15em] text-white [font-variant-caps:all-small-caps]">
+                          WATCH STORY
                         </span>
                       </div>
                     </div>
@@ -1629,94 +1643,108 @@ export default function Page() {
       </section>
 
       <div
-        className={`fixed inset-0 z-[65] bg-[#3A2820]/60 transition-opacity duration-[220ms] ease-out ${
-          danaModalOpen ? "opacity-100" : "pointer-events-none opacity-0"
-        }`}
-        aria-hidden={!danaModalOpen}
-        onClick={() => setDanaModalOpen(false)}
+        className={`fixed inset-0 z-[65] flex justify-end ${danaProfileDrawerOpen ? "pointer-events-auto" : "pointer-events-none"}`}
+        aria-hidden={!danaProfileDrawerOpen}
       >
-        <div className="relative z-[66] flex h-full items-center justify-center p-6">
-          <div
-            className={`relative my-auto flex max-h-[min(88vh,820px)] w-[92%] max-w-2xl flex-col overflow-hidden rounded-[16px] border border-[#D7BFA7] bg-[#FAF7F2] ${SHADOW_TIER1} transition-all duration-[220ms] ease-out md:w-full ${
-              danaModalOpen ? "scale-100 opacity-100" : "scale-[0.96] opacity-0"
-            }`}
-            onClick={(event) => event.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="dana-modal-title"
+        <div
+          className={`absolute inset-0 bg-[rgba(0,0,0,0.4)] transition-opacity duration-[350ms] ease-out ${
+            danaProfileDrawerOpen ? "opacity-100" : "opacity-0"
+          } ${danaProfileDrawerOpen ? "" : "pointer-events-none"}`}
+          aria-hidden="true"
+          onClick={() => setDanaProfileDrawerOpen(false)}
+        />
+        <aside
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="dana-drawer-title"
+          className={`relative z-[66] flex h-full w-[100vw] max-w-[100vw] flex-col bg-[#FAF7F2] shadow-xl transition-transform duration-[350ms] ease-out md:w-[480px] md:max-w-[480px] ${
+            danaProfileDrawerOpen ? "translate-x-0" : "translate-x-full pointer-events-none"
+          }`}
+        >
+          <button
+            type="button"
+            onClick={() => setDanaProfileDrawerOpen(false)}
+            className="absolute right-4 top-4 z-20 inline-flex size-9 items-center justify-center rounded-full bg-[#FAF7F2]/95 text-[#B8704C] shadow-sm transition-colors hover:text-[#3A2820]"
+            aria-label="Close Dana profile"
           >
-            <button
-              type="button"
-              onClick={() => setDanaModalOpen(false)}
-              className="absolute right-4 top-4 z-[1] inline-flex size-8 items-center justify-center text-[#B8704C]"
-              aria-label="Close Dana profile"
-            >
-              <span className="text-lg leading-none">×</span>
-            </button>
-            <div className="max-h-[min(88vh,820px)] overflow-y-auto overscroll-contain px-6 pb-10 pt-12 md:px-10 md:pb-12 md:pt-14">
-              <p className="mb-4 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
-                Meet Dana
-              </p>
-              <h2
-                id="dana-modal-title"
-                className="font-serif text-3xl leading-[1.08] text-[#3A2820] md:text-4xl md:leading-tight"
-              >
-                Founder-Led Care With Clinical Precision
+            <X className="size-4" strokeWidth={1.75} aria-hidden="true" />
+          </button>
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
+            <div className="relative h-[280px] w-full shrink-0">
+              <Image
+                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&q=80"
+                alt="Dana Vargova, founder of Infinity Beauty Lab"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 480px"
+              />
+            </div>
+            <div className="px-6 pb-6 pt-8">
+              <h2 id="dana-drawer-title" className="font-serif text-[32px] leading-tight text-[#3A2820]">
+                Dana Vargova
               </h2>
-              <p className="mt-6 font-sans text-sm leading-relaxed text-[#3A2820]/80 md:text-base">
-                Dana Vargova combines evidence-based aesthetic medicine with a boutique, high-touch approach designed for
-                natural-looking outcomes. Every treatment plan is created for your skin, your schedule, and your long
-                term goals.
+              <p className="mt-2 font-sans text-[11px] uppercase tracking-[0.35em] text-[#B8704C]">
+                Founder & CEO · Infinity Beauty Lab
               </p>
-              <p className="mt-6 font-sans text-sm leading-relaxed text-[#3A2820]/80 md:text-base">
-                Her practice is built on conservative dosing, honest timelines, and protocols that respect your
-                anatomy—so results read as refreshed, never overdone. She continues advanced training with InMode and
-                related platforms to keep technique current as devices evolve.
+              <div className="mt-7 grid grid-cols-2 gap-3">
+                {[
+                  "InMode Verified Expert",
+                  "Top 10% Morpheus8 Provider",
+                  "First in Miami with Optimas Max",
+                  "Morpheus8 QUEEN",
+                ].map((credential) => (
+                  <p
+                    key={credential}
+                    className={`rounded-xl border ${BORDER_CHAMPAGNE} bg-[#EFE3D5]/45 px-3 py-3 font-sans text-[10px] uppercase leading-snug tracking-[0.2em] text-[#3A2820]/85`}
+                  >
+                    {credential}
+                  </p>
+                ))}
+              </div>
+              <p className="mt-10 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
+                The Story
               </p>
-              <p className="mt-5 font-sans text-[10px] uppercase tracking-[0.32em] text-[#B8704C] md:text-[11px]">
-                Selected milestones
+              <p className="mt-4 font-sans text-sm leading-relaxed text-[#3A2820]/80 md:text-base">
+                Dana Vargova began her career in European medicine — training in anesthesiology, emergency medicine, and
+                critical care. That clinical foundation is what separates her approach: she understands anatomy, not just
+                technique.
               </p>
-              <ul className="mt-4 list-inside list-disc space-y-2 font-sans text-sm leading-relaxed text-[#3A2820]/80 md:text-base">
-                <li>InMode Verified Expert; recognized for consistent, complication-aware Morpheus8 outcomes.</li>
-                <li>Top 10% Morpheus8 provider benchmark; complex skin types and combination protocols.</li>
-                <li>First in Miami with Optimas Max; early adoption where it meaningfully improves patient results.</li>
-                <li>Ongoing advanced training across energy-based and light-based modalities.</li>
-              </ul>
-              <p className="mt-10 font-sans text-[10px] uppercase tracking-[0.32em] text-[#B8704C] md:text-[11px]">
-                In the studio
+              <p className="mt-4 font-sans text-sm leading-relaxed text-[#3A2820]/80 md:text-base">
+                After relocating to Miami, she founded Infinity Beauty Lab in Brickell with one conviction — that
+                medical-grade results and boutique care are not mutually exclusive. Every treatment is performed personally
+                by Dana. No junior staff, no delegated care.
               </p>
-              <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                <div className="relative aspect-[4/5] overflow-hidden rounded-[14px] border border-[#B8704C]/20">
-                  <Image
-                    src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&q=80"
-                    alt="Dana Vargova, founder of Infinity Beauty Lab"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 360px"
-                  />
-                </div>
-                <div className="relative aspect-[4/5] overflow-hidden rounded-[14px] border border-[#B8704C]/20">
-                  <Image
-                    src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&q=80"
-                    alt="Consultation at Infinity Beauty Lab"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 360px"
-                  />
-                </div>
-                <div className="relative aspect-[5/4] overflow-hidden rounded-[14px] border border-[#B8704C]/20 sm:col-span-2">
-                  <Image
-                    src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200&q=80"
-                    alt="Treatment room detail at Infinity Beauty Lab"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 720px"
-                  />
-                </div>
+              <p className="mt-10 font-sans text-[10px] uppercase tracking-[0.35em] text-[#B8704C] md:text-[11px]">
+                Beyond the Studio
+              </p>
+              <p className="mt-4 font-sans text-sm leading-relaxed text-[#3A2820]/80 md:text-base">
+                Dana actively supports Angels for Humanity, the WIN Foundation, and the Cala Foundation — focused on
+                medical care for underserved children, trauma recovery, and emotional wellness.
+              </p>
+            </div>
+            <div className="mt-auto border-t border-[#B8704C]/20 px-6 pb-8 pt-4">
+              <div className="flex flex-col gap-2 font-sans text-xs text-[#B8704C]">
+                <a href="tel:+15612320263" className="inline-flex items-center gap-2 transition-colors hover:text-[#3A2820]">
+                  <Phone className="size-4 shrink-0" strokeWidth={1.5} aria-hidden="true" />
+                  <span>(561) 232-0263</span>
+                </a>
+                <a
+                  href="https://instagram.com/infinity.beauty.lab"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 transition-colors hover:text-[#3A2820]"
+                >
+                  <Instagram className="size-4 shrink-0" strokeWidth={1.5} aria-hidden="true" />
+                  <span>@infinity.beauty.lab</span>
+                </a>
+                <p className="inline-flex items-start gap-2">
+                  <MapPin className="mt-0.5 size-4 shrink-0" strokeWidth={1.5} aria-hidden="true" />
+                  <span>40 SW 13th St, Suite 606 · Miami, FL</span>
+                </p>
               </div>
             </div>
           </div>
-        </div>
+        </aside>
       </div>
 
       <div
@@ -1736,16 +1764,15 @@ export default function Page() {
             aria-modal="true"
             aria-label="Reserve your consultation"
           >
-            <div className="mb-5 flex shrink-0 items-center justify-center">
-              <div className="flex items-center gap-3">
-                {[0, 1, 2].map((dotIndex) => {
-                  const isActive = bookingStep === dotIndex && !bookingSubmitted
-                  const isCompleted = bookingStep > dotIndex && !bookingSubmitted
+            <div className="mb-5 w-full shrink-0 pr-7">
+              <div className="flex w-full gap-1" aria-label="Booking progress">
+                {[0, 1, 2].map((segmentIndex) => {
+                  const isBronze = bookingSubmitted || segmentIndex <= bookingStep
                   return (
-                    <span
-                      key={dotIndex}
-                      className={`h-2.5 w-2.5 rounded-full transition-colors duration-300 ${
-                        isActive || isCompleted ? "bg-[#B8704C]" : "bg-[#D7BFA7]"
+                    <div
+                      key={segmentIndex}
+                      className={`h-[3px] min-h-0 flex-1 rounded-full transition-colors duration-300 ${
+                        isBronze ? "bg-[#B8704C]" : "bg-[#EFE3D5]"
                       }`}
                     />
                   )
@@ -1777,6 +1804,12 @@ export default function Page() {
                       <h3 className="font-serif text-3xl text-[#3A2820] md:text-[2.35rem]">
                         Reserve your consultation
                       </h3>
+                      <p
+                        className="mt-2 font-sans text-[12px] italic leading-relaxed"
+                        style={{ color: "rgba(58, 40, 32, 0.55)" }}
+                      >
+                        No commitment required — we&apos;ll confirm by phone.
+                      </p>
                       <p className="mt-3 font-sans text-sm leading-relaxed text-[#3A2820]/70 md:text-base">
                         Step 1 of 3 — choose the treatment you have in mind. We&apos;ll confirm scheduling after we
                         reach you.

@@ -2,9 +2,13 @@
 
 import { useEffect, useState } from "react"
 import Image from "next/image"
+import { Inter } from "next/font/google"
+
+const interTapToCall = Inter({ subsets: ["latin"], weight: ["400"] })
 
 type HeroProps = {
   onOpenBookingModal: () => void
+  onOpenAboutDrawer: () => void
 }
 
 const mobileNavItems = [
@@ -21,7 +25,7 @@ const mobileNavItems = [
   { label: "Book your visit", targetId: "book" },
 ]
 
-export default function Hero({ onOpenBookingModal }: HeroProps) {
+export default function Hero({ onOpenBookingModal, onOpenAboutDrawer }: HeroProps) {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
   const [isHamburgerOnDarkSection, setIsHamburgerOnDarkSection] = useState(true)
 
@@ -179,6 +183,11 @@ export default function Hero({ onOpenBookingModal }: HeroProps) {
                   href={`#${item.id}`}
                   onClick={(event) => {
                     event.preventDefault()
+                    if (item.id === "about") {
+                      window.history.pushState(null, "", "#about")
+                      onOpenAboutDrawer()
+                      return
+                    }
                     scrollToSectionId(item.id)
                   }}
                   className="font-sans text-[11px] tracking-[0.3em] uppercase text-white/55 hover:text-white/90 transition-colors duration-300 font-light"
@@ -226,28 +235,43 @@ export default function Hero({ onOpenBookingModal }: HeroProps) {
 
         {/* CTA cluster */}
         <div className="flex flex-col items-center gap-5">
-          <button
-            type="button"
-            onClick={onOpenBookingModal}
-            className="group relative inline-flex items-center justify-center
-              font-sans text-[11px] md:text-[12px] font-medium tracking-[0.3em] uppercase
-              text-white border border-white/20
-              px-10 md:px-14 py-4 md:py-5
-              transition-all duration-500
-              hover:border-[#B8704C]/70 overflow-hidden"
-            style={{ backgroundColor: "#B8704C" }}
-            aria-label="Reserve your consultation at Infinity Beauty Lab"
-          >
-            {/* Shine effect on hover */}
-            <span
-              className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"
-              style={{
-                background:
-                  "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%)",
-              }}
-            />
-            <span className="relative">Reserve Your Consultation</span>
-          </button>
+          <div className="flex flex-col items-center gap-2">
+            <button
+              type="button"
+              onClick={onOpenBookingModal}
+              className="group relative inline-flex items-center justify-center
+                font-sans text-[11px] md:text-[12px] font-medium tracking-[0.3em] uppercase
+                text-white border border-white/20
+                px-10 md:px-14 py-4 md:py-5
+                transition-all duration-500
+                hover:border-[#B8704C]/70 overflow-hidden"
+              style={{ backgroundColor: "#B8704C" }}
+              aria-label="Reserve your consultation at Infinity Beauty Lab"
+            >
+              {/* Shine effect on hover */}
+              <span
+                className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"
+                style={{
+                  background:
+                    "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%)",
+                }}
+              />
+              <span className="relative">Reserve Your Consultation</span>
+            </button>
+            <p
+              className={`${interTapToCall.className} text-center text-[12px]`}
+              style={{ color: "rgba(184, 112, 76, 0.7)" }}
+            >
+              or call us ·{" "}
+              <a
+                href="tel:+15612320263"
+                className="underline decoration-transparent underline-offset-2 transition-colors hover:decoration-[#B8704C]/50"
+                style={{ color: "inherit" }}
+              >
+                (561) 232-0263
+              </a>
+            </p>
+          </div>
 
           {/* Treatment tags */}
           <p
