@@ -18,8 +18,8 @@ import {
   Check,
 } from "lucide-react"
 
+import { Inter } from "next/font/google"
 import Hero from "@/components/hero"
-import { PressMarkRow } from "@/components/press-marks"
 import {
   BORDER_CHAMPAGNE,
   ScrollReveal,
@@ -33,6 +33,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+
+const credentialMarks = Inter({ subsets: ["latin"], weight: ["400", "500"] })
 
 const trustItems = ["InMode", "FDA-Cleared", "Top 10% Provider", "Verified Expert"]
 
@@ -1252,7 +1254,7 @@ export default function Page() {
                 A boutique space designed for privacy, focus, and results. Located in the heart of Brickell.
               </p>
               <p className="mt-6 border-t border-[#B8704C]/20 pt-4 font-sans text-[10px] uppercase tracking-[0.2em] text-[#3A2820]/65 md:text-[11px]">
-                1221 Brickell Ave, Miami, FL - Complimentary garage parking available
+                40 SW 13th St, Suite 606, Miami, FL 33130 - Complimentary garage parking available
               </p>
             </div>
           </ScrollRevealItem>
@@ -1366,11 +1368,23 @@ export default function Page() {
             </ScrollRevealItem>
 
             <ScrollRevealItem order={3}>
-              <div className="mt-10 border-t border-[#B8704C]/12 pt-8 md:mt-12 md:pt-10">
-                <p className="text-center font-sans text-[9px] uppercase tracking-[0.28em] text-[#3A2820]/40 md:text-[10px]">
-                  As featured in
+              <div className={`mt-12 md:mt-14 ${credentialMarks.className}`}>
+                <div className="mx-auto flex max-w-md items-center gap-3 md:max-w-lg">
+                  <span className="h-px min-w-0 flex-1 bg-[#B8704C]/35" aria-hidden />
+                  <span className="shrink-0 text-center text-[10px] font-medium tracking-[0.14em] text-[#B8704C] [font-variant-caps:all-small-caps] md:text-[11px]">
+                    RECOGNIZED BY
+                  </span>
+                  <span className="h-px min-w-0 flex-1 bg-[#B8704C]/35" aria-hidden />
+                </div>
+                <p className="mx-auto mt-5 max-w-4xl text-center text-[11px] font-medium leading-relaxed tracking-[0.1em] text-[#3A2820]/45 [font-variant-caps:all-small-caps]">
+                  <span>InMode Verified Expert</span>
+                  <span className="mx-2 text-[#3A2820]/35">·</span>
+                  <span>Top 10% Provider 2024</span>
+                  <span className="mx-2 text-[#3A2820]/35">·</span>
+                  <span>FDA-Cleared Technology</span>
+                  <span className="mx-2 text-[#3A2820]/35">·</span>
+                  <span>Morpheus8 QUEEN</span>
                 </p>
-                <PressMarkRow />
               </div>
             </ScrollRevealItem>
           </ScrollReveal>
@@ -1538,7 +1552,7 @@ export default function Page() {
             <div className="space-y-6 rounded-[24px] border border-[#D4956F]/30 bg-[#FAF7F2]/5 p-6 md:p-7">
             <div>
               <p className="font-sans text-[10px] uppercase tracking-[0.25em] text-[#D4956F] md:text-[11px]">Address</p>
-              <p className="mt-2 font-serif text-2xl text-[#FAF7F2]">1221 Brickell Ave, Miami, FL</p>
+              <p className="mt-2 font-serif text-2xl text-[#FAF7F2]">40 SW 13th St, Suite 606, Miami, FL 33130</p>
             </div>
             <div>
               <p className="font-sans text-[10px] uppercase tracking-[0.25em] text-[#D4956F] md:text-[11px]">Hours</p>
@@ -1552,10 +1566,10 @@ export default function Page() {
               <p className="font-sans text-[10px] uppercase tracking-[0.25em] text-[#D4956F] md:text-[11px]">Phone</p>
               <p className="mt-2 font-sans text-sm leading-relaxed text-[#FAF7F2]/80">
                 <a
-                  href="tel:+13055550142"
+                  href="tel:+15612320263"
                   className="text-[#FAF7F2]/90 transition-colors hover:text-[#E9D2BE]"
                 >
-                  (305) 555-0142
+                  (561) 232-0263
                 </a>
               </p>
             </div>

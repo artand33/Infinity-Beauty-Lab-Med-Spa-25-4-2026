@@ -277,7 +277,7 @@ export default function Hero({ onOpenBookingModal }: HeroProps) {
             />
           </svg>
           <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-white/40 font-light">
-            1221 Brickell Ave, Miami, FL
+            40 SW 13th St, Suite 606, Miami, FL 33130
           </span>
         </div>
 
